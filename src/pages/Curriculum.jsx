@@ -112,51 +112,74 @@ const yearsData = [
   },
 ]
 
+// 다크 테마용 모듈 색상 (배경 위 글래스모피즘에 잘 어울리는 채도 + 골드 친화)
 const moduleColor = {
-  'Business Core':              'bg-[#d4a574]/15 text-[#a06d3d]',
-  'Marketing':                  'bg-[#e8775c]/15 text-[#a64534]',
-  'Accounting & Finance':       'bg-[#0a1e3f]/10 text-[#0a1e3f]',
-  'Management Strategy':        'bg-[#1a3567]/15 text-[#1a3567]',
-  'Data Analytics Core':        'bg-emerald-500/15 text-emerald-700',
-  'Data Analytics':             'bg-emerald-500/10 text-emerald-700',
-  'AI Applications Core':       'bg-purple-500/15 text-purple-700',
-  'AI Applications':            'bg-purple-500/10 text-purple-700',
+  'Business Core':              'bg-[#d4a574]/20 text-[#e8c39a] ring-1 ring-[#d4a574]/30',
+  'Marketing':                  'bg-[#e8775c]/20 text-[#f4a896] ring-1 ring-[#e8775c]/30',
+  'Accounting & Finance':       'bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/30',
+  'Management Strategy':        'bg-cyan-400/15 text-cyan-200 ring-1 ring-cyan-400/30',
+  'Data Analytics Core':        'bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-400/30',
+  'Data Analytics':             'bg-emerald-400/15 text-emerald-200 ring-1 ring-emerald-400/30',
+  'AI Applications Core':       'bg-fuchsia-400/20 text-fuchsia-200 ring-1 ring-fuchsia-400/30',
+  'AI Applications':            'bg-fuchsia-400/15 text-fuchsia-200 ring-1 ring-fuchsia-400/30',
 }
 
-function CourseCard({ name, module, prof, isTBA }) {
+function CourseCard({ name, module, prof, isTBA, accent }) {
   return (
-    <div className={`p-3 rounded-lg border ${isTBA ? 'border-dashed border-gray-300 bg-gray-50' : 'border-gray-200 bg-white'}
-      hover:border-[#d4a574] transition`}>
-      <div className={`text-sm font-semibold ${isTBA ? 'text-gray-400 italic' : 'text-[#0a1e3f]'}`}>
+    <div className={`group relative overflow-hidden p-3.5 rounded-xl backdrop-blur-md transition-all duration-300
+      ${isTBA
+        ? 'bg-white/[0.03] border border-dashed border-white/15'
+        : 'bg-white/[0.06] border border-white/10 hover:bg-white/[0.10] hover:border-white/25 hover:-translate-y-0.5'
+      }`}>
+      {/* 호버 시 좌측에 트랙 색 라인 */}
+      {!isTBA && (
+        <div className={`absolute left-0 top-0 bottom-0 w-1 ${accent} opacity-0 group-hover:opacity-100 transition-opacity`} />
+      )}
+      <div className={`text-sm font-semibold leading-snug ${isTBA ? 'text-white/35 italic' : 'text-white'}`}>
         {name}
       </div>
-      <div className="flex items-center justify-between mt-2 gap-2">
-        <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded ${moduleColor[module] || 'bg-gray-100 text-gray-600'}`}>
+      <div className="flex items-center justify-between mt-2.5 gap-2">
+        <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded
+          ${moduleColor[module] || 'bg-white/10 text-white/60'}`}>
           {module}
         </span>
-        <span className="text-[10px] text-gray-500">{prof}</span>
+        <span className={`text-[10px] ${isTBA ? 'text-white/30' : 'text-white/50'} font-medium`}>
+          {prof}
+        </span>
       </div>
     </div>
   )
 }
 
-function TrackColumn({ icon: Icon, title, subtitle, color, sem1, sem2 }) {
+function TrackColumn({ icon: Icon, title, subtitle, gradient, iconColor, accent, sem1, sem2 }) {
   return (
-    <div className={`rounded-2xl border-2 ${color} p-5`}>
-      <div className="flex items-center gap-3 mb-5 pb-4 border-b border-current/20">
-        <Icon className="text-current" size={22} />
+    <div className="relative rounded-3xl p-6 overflow-hidden
+      bg-gradient-to-br from-white/[0.04] to-white/[0.01]
+      border border-white/10 backdrop-blur-sm">
+      {/* 상단 그라데이션 stripe */}
+      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${gradient}`} />
+      {/* 우상단 광원 효과 */}
+      <div className={`absolute -top-20 -right-20 w-60 h-60 rounded-full bg-gradient-to-br ${gradient} opacity-10 blur-3xl`} />
+
+      <div className="relative flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
+        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg`}>
+          <Icon className="text-white" size={22} />
+        </div>
         <div>
-          <div className="font-bold text-white">{title}</div>
-          <div className="text-xs text-white/60">{subtitle}</div>
+          <div className="font-bold text-white text-lg leading-tight">{title}</div>
+          <div className="text-xs text-white/50 mt-0.5">{subtitle}</div>
         </div>
       </div>
 
       {sem1 && (
         <div className="mb-5">
-          <div className="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-2">Semester 1</div>
+          <div className={`text-[10px] uppercase tracking-[0.2em] ${iconColor} font-bold mb-3 flex items-center gap-2`}>
+            <span className="w-6 h-px bg-current opacity-50" />
+            Semester 1
+          </div>
           <div className="space-y-2">
             {sem1.map((c, i) => (
-              <CourseCard key={i} {...c} isTBA={c.name === 'TBA'} />
+              <CourseCard key={i} {...c} isTBA={c.name === 'TBA'} accent={`bg-gradient-to-b ${gradient}`} />
             ))}
           </div>
         </div>
@@ -164,10 +187,13 @@ function TrackColumn({ icon: Icon, title, subtitle, color, sem1, sem2 }) {
 
       {sem2 && (
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-2">Semester 2</div>
+          <div className={`text-[10px] uppercase tracking-[0.2em] ${iconColor} font-bold mb-3 flex items-center gap-2`}>
+            <span className="w-6 h-px bg-current opacity-50" />
+            Semester 2
+          </div>
           <div className="space-y-2">
             {sem2.map((c, i) => (
-              <CourseCard key={i} {...c} isTBA={c.name === 'TBA'} />
+              <CourseCard key={i} {...c} isTBA={c.name === 'TBA'} accent={`bg-gradient-to-b ${gradient}`} />
             ))}
           </div>
         </div>
@@ -189,8 +215,18 @@ export default function Curriculum() {
           Business Management and AI Medical Data Science tracks in parallel."
       />
 
-      <section className="py-24 bg-[#0a1e3f] text-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+      <section className="relative py-24 text-white overflow-hidden
+        bg-gradient-to-br from-[#060f23] via-[#0a1e3f] to-[#0f1024]">
+        {/* 글로우 배경 효과 */}
+        <div className="absolute inset-0 opacity-40 pointer-events-none"
+          style={{ backgroundImage: `radial-gradient(circle at 15% 10%, rgba(212,165,116,0.25) 0%, transparent 45%),
+                                     radial-gradient(circle at 85% 90%, rgba(217,70,239,0.18) 0%, transparent 45%),
+                                     radial-gradient(circle at 50% 50%, rgba(34,211,238,0.08) 0%, transparent 60%)` }} />
+        {/* 그리드 텍스처 */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
+          style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
           {/* 연도 탭 */}
           <div className="flex flex-wrap justify-center gap-2 mb-12">
             {yearsData.map((yr, i) => (
@@ -220,22 +256,33 @@ export default function Curriculum() {
 
             {/* Year 1: Common Foundations */}
             {active === 0 && y.common && (
-              <div className="max-w-3xl mx-auto rounded-2xl border-2 border-[#d4a574]/40 p-8">
-                <div className="flex items-center gap-3 mb-5">
-                  <BookOpen className="text-[#d4a574]" size={22} />
-                  <div className="font-bold">Open Major · Common Foundations</div>
-                </div>
-                <p className="text-sm text-white/70 mb-5">
-                  All Year 1 students take a common liberal arts and quantitative foundation —
-                  no major declared yet. Specialization begins in Year 2.
-                </p>
-                <div className="space-y-2">
-                  {y.common.map((c, i) => (
-                    <div key={i} className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
-                      <ChevronRight size={14} className="text-[#d4a574]" />
-                      <span className="text-sm">{c}</span>
+              <div className="relative max-w-3xl mx-auto rounded-3xl p-8 overflow-hidden
+                bg-gradient-to-br from-white/[0.04] to-white/[0.01]
+                border border-white/10 backdrop-blur-sm">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4a574] via-[#e8775c] to-[#d4a574]" />
+                <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-[#d4a574]/15 blur-3xl" />
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d4a574] to-[#e8775c]
+                      flex items-center justify-center shadow-lg">
+                      <BookOpen className="text-white" size={22} />
                     </div>
-                  ))}
+                    <div className="font-bold text-white text-lg">Open Major · Common Foundations</div>
+                  </div>
+                  <p className="text-sm text-white/70 mb-5 leading-relaxed">
+                    All Year 1 students take a common liberal arts and quantitative foundation —
+                    no major declared yet. Specialization begins in Year 2.
+                  </p>
+                  <div className="space-y-2">
+                    {y.common.map((c, i) => (
+                      <div key={i} className="group flex items-center gap-3 p-3.5 rounded-xl
+                        bg-white/[0.06] border border-white/10 backdrop-blur-md
+                        hover:bg-white/[0.10] hover:border-white/25 transition">
+                        <ChevronRight size={14} className="text-[#e8c39a]" />
+                        <span className="text-sm text-white">{c}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -247,7 +294,8 @@ export default function Curriculum() {
                   icon={Briefcase}
                   title="Business Management Track"
                   subtitle="경영학전공"
-                  color="border-[#d4a574]/40 text-[#d4a574]"
+                  gradient="from-[#d4a574] to-[#e8775c]"
+                  iconColor="text-[#e8c39a]"
                   sem1={y.business?.sem1}
                   sem2={y.business?.sem2}
                 />
@@ -255,7 +303,8 @@ export default function Curriculum() {
                   icon={BrainCircuit}
                   title="AI Medical Data Science Track"
                   subtitle="AI의료데이터학전공"
-                  color="border-purple-400/40 text-purple-300"
+                  gradient="from-fuchsia-500 to-cyan-400"
+                  iconColor="text-fuchsia-200"
                   sem1={y.ai?.sem1}
                   sem2={y.ai?.sem2}
                 />
