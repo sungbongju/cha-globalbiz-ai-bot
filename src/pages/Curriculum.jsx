@@ -124,6 +124,18 @@ const moduleColor = {
   'AI Applications':            'bg-fuchsia-400/15 text-fuchsia-200 ring-1 ring-fuchsia-400/30',
 }
 
+// 라이트 테마용 모듈 색상 (Modular Structure 섹션처럼 흰 배경에서 잘 보이도록)
+const moduleColorLight = {
+  'Business Core':              'bg-[#d4a574]/25 text-[#7a4f24] ring-1 ring-[#d4a574]/50',
+  'Marketing':                  'bg-[#e8775c]/20 text-[#8a3a26] ring-1 ring-[#e8775c]/50',
+  'Accounting & Finance':       'bg-slate-200 text-slate-800 ring-1 ring-slate-400',
+  'Management Strategy':        'bg-cyan-100 text-cyan-900 ring-1 ring-cyan-400',
+  'Data Analytics Core':        'bg-emerald-100 text-emerald-900 ring-1 ring-emerald-500',
+  'Data Analytics':             'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-400',
+  'AI Applications Core':       'bg-fuchsia-100 text-fuchsia-900 ring-1 ring-fuchsia-500',
+  'AI Applications':            'bg-fuchsia-50 text-fuchsia-800 ring-1 ring-fuchsia-400',
+}
+
 function CourseCard({ name, module, prof, isTBA, accent }) {
   return (
     <div className={`group relative overflow-hidden p-3.5 rounded-xl backdrop-blur-md transition-all duration-300
@@ -353,11 +365,16 @@ export default function Curriculum() {
               { name: 'AI Applications Core',  track: 'AI' },
               { name: 'AI Applications',       track: 'AI' },
             ].map(m => (
-              <div key={m.name} className="flex items-center justify-between p-4 rounded-xl bg-[#faf8f3]
-                border border-gray-100">
-                <span className="font-semibold text-[#0a1e3f]">{m.name}</span>
-                <span className={`text-xs font-bold px-2 py-1 rounded ${moduleColor[m.name] || 'bg-gray-100 text-gray-600'}`}>
-                  {m.track}
+              <div key={m.name} className="flex items-center justify-between gap-3 p-4 rounded-xl bg-[#faf8f3]
+                border border-gray-200 hover:border-[#d4a574]/50 hover:shadow-sm transition">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className={`flex-shrink-0 text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded ${moduleColorLight[m.name] || 'bg-gray-100 text-gray-700'}`}>
+                    {m.name}
+                  </span>
+                </div>
+                <span className={`text-[10px] uppercase tracking-widest font-bold
+                  ${m.track === 'Business' ? 'text-[#d4a574]' : 'text-fuchsia-600'}`}>
+                  {m.track} Track
                 </span>
               </div>
             ))}
