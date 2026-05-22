@@ -4,40 +4,40 @@ import { Award, ArrowRight, TrendingUp, Building2, Rocket } from 'lucide-react'
 import PageHero from '../components/PageHero'
 
 const careers = [
-  { name: 'AI Product Manager',     industry: 'Tech', salary: '$80-120k' },
-  { name: 'Data Scientist',         industry: 'Tech · Finance', salary: '$90-140k' },
-  { name: 'Business Analyst',       industry: 'Consulting', salary: '$70-100k' },
-  { name: 'Strategy Consultant',    industry: 'Consulting', salary: '$85-130k' },
-  { name: 'Digital Marketing Lead', industry: 'Tech · Retail', salary: '$70-110k' },
-  { name: 'Startup Founder',        industry: 'Tech', salary: '∞' },
-  { name: 'AI Research Engineer',   industry: 'AI Lab', salary: '$95-150k' },
-  { name: 'Investment Analyst',     industry: 'Finance', salary: '$80-130k' },
-  { name: 'UX Researcher',          industry: 'Tech', salary: '$70-110k' },
+  { name: 'Global Pharmaceutical & Biotech', industry: 'Bio-Healthcare' },
+  { name: 'Digital Health Ventures',          industry: 'Health Tech' },
+  { name: 'Semiconductor & Battery Industry', industry: 'Advanced Manufacturing' },
+  { name: 'Healthcare Consulting',            industry: 'Consulting' },
+  { name: 'Life-Science Investment',          industry: 'Finance' },
+  { name: 'Technology & Trade Policy',        industry: 'Public Agency' },
+  { name: 'AI Strategy in Bio-Healthcare',    industry: 'Bio-Healthcare' },
+  { name: 'K-Content & K-Beauty Business',    industry: 'Global Brands' },
+  { name: 'Cross-Border Platform Enterprise', industry: 'Tech' },
 ]
 
 const tracks = [
   {
     icon: Building2,
-    title: 'Corporate Track',
-    desc: 'Join Korean conglomerates (Samsung, LG, Hyundai) or global firms (McKinsey, Google).',
-    companies: ['Samsung', 'LG', 'McKinsey', 'Google', 'Microsoft'],
-    img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80&auto=format&fit=crop',
+    title: 'Bio-Healthcare Industry',
+    desc: 'Global pharmaceutical and biotech corporations, digital health ventures, and healthcare consulting firms — the frontier where life sciences meet AI strategy.',
+    companies: ['Pharma & Biotech', 'Digital Health', 'Hospital Networks', 'Clinical Research'],
+    img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80&auto=format&fit=crop',
     color: 'from-[#0a1e3f] to-[#1a3567]'
   },
   {
     icon: Rocket,
-    title: 'Startup Track',
-    desc: 'Launch your own venture with CHA Bio-Group network and Korean startup ecosystem.',
-    companies: ['Y Combinator (KR)', 'Sparklabs', 'Primer', 'CHA Bio-Group'],
+    title: 'Advanced Manufacturing & Tech',
+    desc: 'Semiconductor and battery enterprises, platform companies, and K-content & K-beauty global brands — leveraging your bilingual fluency in business and AI.',
+    companies: ['Semiconductors', 'Batteries', 'Platform Enterprises', 'K-Content / K-Beauty'],
     img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80&auto=format&fit=crop',
     color: 'from-[#d4a574] to-[#c19463]'
   },
   {
     icon: TrendingUp,
-    title: 'Graduate School Track',
-    desc: 'Continue to top MBA or AI research programs worldwide.',
-    companies: ['Stanford GSB', 'Wharton', 'MIT Sloan', 'INSEAD', 'KAIST'],
-    img: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80&auto=format&fit=crop',
+    title: 'Investment & Policy',
+    desc: 'Life-science investment institutions and public agencies shaping technology and trade policy across borders — the strategic architects of national competitiveness.',
+    companies: ['Life-Science VC', 'Policy Agencies', 'Cross-border Trade', 'Strategic Consulting'],
+    img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80&auto=format&fit=crop',
     color: 'from-[#e8775c] to-[#c95a44]'
   },
 ]
@@ -47,9 +47,9 @@ export default function Career() {
     <>
       <PageHero
         eyebrow="Career Outcomes"
-        title="Your career, without borders"
-        subtitle="Graduates work at the intersection of technology, business, and global markets —
-          from Silicon Valley to Singapore."
+        title="Where strategic intent meets technological execution"
+        subtitle="Companies competing in AI-driven bio-healthcare, advanced manufacturing, and platform
+          industries are no longer asking whether to hire hybrid talent — but where to find enough of it."
       />
 
       <section className="py-24 bg-white">
@@ -108,11 +108,14 @@ export default function Career() {
       <section className="py-24 bg-[#faf8f3]">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#0a1e3f]"
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0a1e3f] mb-3"
               style={{ fontFamily: "'Playfair Display', serif" }}>
-              Roles our graduates take
+              Career pathways our graduates pursue
             </h2>
-            <p className="text-gray-600 mt-3 text-sm">Salary ranges are USD, entry-to-mid level (varies by region).</p>
+            <p className="text-gray-600 text-sm">
+              Bilingual professionals — fluent in both the language of global business strategy
+              and the language of artificial intelligence.
+            </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -122,12 +125,13 @@ export default function Career() {
                 viewport={{ once: true }} transition={{ duration: 0.3, delay: i * 0.05 }}
                 className="p-5 rounded-2xl bg-white border border-gray-100 hover:border-[#d4a574]
                   hover:shadow-lg transition">
-                <div className="font-bold text-[#0a1e3f] mb-1"
+                <div className="font-bold text-[#0a1e3f] mb-2 leading-tight"
                   style={{ fontFamily: "'Playfair Display', serif" }}>
                   {c.name}
                 </div>
-                <div className="text-xs text-gray-500 mb-2">{c.industry}</div>
-                <div className="text-sm font-mono text-[#d4a574] font-semibold">{c.salary}</div>
+                <div className="text-xs text-[#d4a574] font-semibold uppercase tracking-wider">
+                  {c.industry}
+                </div>
               </motion.div>
             ))}
           </div>
@@ -139,11 +143,12 @@ export default function Career() {
           <Award className="mx-auto text-[#d4a574] mb-6" size={48} />
           <h2 className="text-3xl md:text-4xl font-bold mb-4"
             style={{ fontFamily: "'Playfair Display', serif" }}>
-            E-7 Visa Pathway for International Graduates
+            A strategic gateway to Korean and Asian markets
           </h2>
-          <p className="text-white/80 mb-8 max-w-2xl mx-auto">
-            For graduates who want to stay in Korea, we provide visa support, employer connections,
-            and career counseling — all the way from graduation to employment.
+          <p className="text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
+            International students gain cultural fluency, regional networks, and firsthand insight
+            into the industries that global employers increasingly regard as essential — equipping
+            you to lead in technology-driven industries over the long arc of a career.
           </p>
           <Link to="/admission" className="inline-flex items-center gap-2 px-7 py-4 rounded-full
             bg-[#d4a574] text-white font-semibold hover:bg-[#c19463] transition">

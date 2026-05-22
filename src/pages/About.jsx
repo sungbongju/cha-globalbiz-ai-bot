@@ -7,10 +7,9 @@ export default function About() {
     <>
       <PageHero
         eyebrow="About the Program"
-        title="A dream worth four years of your life"
-        subtitle="The Global Business AI Major at CHA University is more than a degree —
-          it is a journey designed for ambitious international students who want to lead
-          business transformation in the age of AI."
+        title="The era when AI co-designs strategy"
+        subtitle="Welcome to the Global Business AI Major at the College of Future Convergence,
+          CHA University. We sincerely welcome everyone visiting our homepage."
       />
 
       <section className="py-24 bg-white">
@@ -19,12 +18,18 @@ export default function About() {
             <div className="lg:col-span-7">
               <h2 className="text-3xl md:text-4xl font-bold text-[#0a1e3f] mb-6"
                 style={{ fontFamily: "'Playfair Display', serif" }}>
-                Our Vision
+                The convergence that defines tomorrow
               </h2>
+              <p className="text-lg text-gray-700 leading-relaxed mb-4">
+                The global economy has entered an era in which artificial intelligence no longer
+                plays a supporting role but actively reshapes how value is created, captured,
+                and distributed across every industry on the planet.
+              </p>
               <p className="text-lg text-gray-700 leading-relaxed">
-                We empower global students to become AI-driven business leaders who can navigate
-                cross-cultural markets, design ethical AI products, and shape industries that don't
-                yet exist. Our graduates will not just adapt to the future of work — they will define it.
+                Traditional boundaries between business strategy and technological capability have
+                effectively dissolved. The convergence of <strong className="text-[#0a1e3f]">global business acumen and
+                artificial intelligence fluency</strong> has emerged as the single most decisive
+                competency for the next generation of executives, entrepreneurs, and policy architects worldwide.
               </p>
             </div>
             <div className="lg:col-span-5">
@@ -47,18 +52,19 @@ export default function About() {
             <div className="lg:col-span-7 order-1 lg:order-2">
               <h2 className="text-3xl md:text-4xl font-bold text-[#0a1e3f] mb-6"
                 style={{ fontFamily: "'Playfair Display', serif" }}>
-                Why this major?
+                Why CHA, why now?
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed mb-4">
-                The intersection of AI and business is the defining career space of the next decade.
-                From healthcare to finance, from marketing to operations — every industry is being
-                rewritten by AI. Yet most undergraduate programs treat these as separate disciplines.
-                We don't.
+                Korea today stands as a global leader in <strong className="text-[#0a1e3f]">semiconductors,
+                secondary batteries, biopharmaceuticals, automobiles, displays, shipbuilding</strong>,
+                and the rapidly expanding K-content and K-beauty industries — offering students an
+                unparalleled live laboratory of globally competitive sectors at every stage of value creation.
               </p>
               <p className="text-lg text-gray-700 leading-relaxed">
-                Hosted by the <strong className="text-[#0a1e3f]">School of Global Convergence</strong>,
-                part of Korea's pioneering CHA Bio-Group, you'll have unmatched access to hospital
-                networks, biotech labs, and a thriving startup ecosystem.
+                Within this national ecosystem, CHA University occupies a distinctive position
+                through its deep specialization in <strong className="text-[#0a1e3f]">bio-healthcare</strong>,
+                providing direct engagement with university hospitals, fertility centers, biotech ventures,
+                and clinical research institutes operating on the global frontier of life sciences.
               </p>
             </div>
           </div>
@@ -73,12 +79,12 @@ export default function About() {
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: Globe2,       title: 'English-only Curriculum', desc: 'Every course taught fully in English, by faculty with international experience.' },
-              { icon: Users,        title: 'Small Class Size',         desc: 'Maximum 25 students per cohort. You will know every classmate and every professor.' },
-              { icon: BrainCircuit, title: 'Hands-on AI Projects',     desc: 'Build real AI products from Year 2. No more theoretical learning without practice.' },
-              { icon: Briefcase,    title: 'Industry Internships',     desc: 'Partner with CHA Bio-Group and 30+ Korean and global companies.' },
-              { icon: Heart,        title: 'Cultural Support',         desc: 'Korean language classes, peer mentors, and visa support for international students.' },
-              { icon: Award,        title: 'Career Pathway',           desc: 'E-7 visa support for graduates who want to launch their career in Korea.' },
+              { icon: Globe2,       title: 'English-Only Curriculum',  desc: 'Every course taught fully in English — learning not from textbook abstractions but from immersion in Korea\'s most advanced export industries.' },
+              { icon: BrainCircuit, title: 'AI as Strategic Lens',      desc: 'AI is treated not as a supporting tool but as the cross-cutting strategic lens through which every business decision is examined.' },
+              { icon: Heart,        title: 'Bio-Healthcare Anchor',     desc: 'Direct engagement with CHA hospitals, fertility centers, biotech ventures, and clinical research institutes on the global frontier of life sciences.' },
+              { icon: Briefcase,    title: 'Korea\'s Industrial Ecosystem', desc: 'Live laboratory of semiconductors, batteries, biopharma, automobiles, displays, shipbuilding, K-content, and K-beauty — globally competitive at every stage of value creation.' },
+              { icon: Users,        title: 'Bilingual Professionals',   desc: 'Graduates fluent in both the language of global business strategy and the language of artificial intelligence — a hybrid talent profile increasingly sought worldwide.' },
+              { icon: Award,        title: 'Long-Arc Career Vision',    desc: 'Analytical judgment, executive vision, cross-cultural communication, and ethical sensibility required of those who lead in technology-driven industries over decades — not just first jobs.' },
             ].map(f => (
               <div key={f.title} className="p-6 rounded-2xl bg-white border border-gray-100 hover:shadow-lg transition">
                 <f.icon className="text-[#d4a574] mb-4" size={28} />

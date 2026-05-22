@@ -6,12 +6,12 @@ export default function Major() {
   const pillars = [
     {
       icon: BrainCircuit,
-      title: 'AI Foundations',
-      desc: 'Machine learning, NLP, computer vision, generative AI — all built around real business cases, not abstract theory.',
+      title: 'AI Fluency',
+      desc: 'AI no longer plays a supporting role — it actively reshapes how value is created, captured, and distributed. Our students learn AI as the cross-cutting strategic lens of modern enterprise.',
       details: [
-        'Python & Machine Learning',
-        'Natural Language Processing',
-        'Generative AI & LLMs',
+        'Algorithmic Competition',
+        'Platform Economics',
+        'Data-Driven Decision Making',
         'AI Ethics & Governance',
       ],
       img: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80&auto=format&fit=crop',
@@ -19,28 +19,28 @@ export default function Major() {
     },
     {
       icon: Briefcase,
-      title: 'Business Strategy',
-      desc: 'Marketing, finance, operations, entrepreneurship — taught through global case studies from Asian and Western markets.',
+      title: 'Global Business',
+      desc: 'Strategic judgment across cultures, markets, and disciplines — taught through immersion in Korea\'s most dynamic export-driven economy, where global volatility is the operating norm.',
       details: [
-        'Digital Marketing & Analytics',
-        'Strategic Management',
-        'Global Finance & FinTech',
-        'Operations & Supply Chain AI',
+        'Cross-Cultural Strategy',
+        'International Trade & Markets',
+        'Global Finance & Investment',
+        'Executive Vision',
       ],
       img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80&auto=format&fit=crop',
       color: 'from-[#d4a574] to-[#c19463]'
     },
     {
       icon: Globe2,
-      title: 'Global Fluency',
-      desc: 'Multilingual communication, cross-cultural leadership, international internships — your network spans 12+ countries.',
+      title: 'Bio-Healthcare Anchor',
+      desc: 'Direct engagement with CHA\'s university hospitals, fertility centers, biotech ventures, and clinical research institutes — anchoring your expertise in Korea\'s leading frontier of life sciences.',
       details: [
-        'Cross-Cultural Communication',
-        'International Business Law',
-        'Korean Language (optional)',
-        'Global Internship Program',
+        'Hospital & Clinical Research',
+        'Biotech & Digital Health Ventures',
+        'Biopharmaceutical Strategy',
+        'Healthcare Policy & Trade',
       ],
-      img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80&auto=format&fit=crop',
+      img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80&auto=format&fit=crop',
       color: 'from-[#e8775c] to-[#c95a44]'
     },
   ]
@@ -50,8 +50,8 @@ export default function Major() {
       <PageHero
         eyebrow="Major Overview"
         title="Global Business AI"
-        subtitle="An interdisciplinary undergraduate major combining AI engineering,
-          business strategy, and global perspectives — designed exclusively for international students."
+        subtitle="Where bio-healthcare anchors expertise and AI co-designs strategy — the only undergraduate
+          program that fuses these three disciplines into a single trajectory, taught entirely in English."
       />
 
       <section className="py-24 bg-white">

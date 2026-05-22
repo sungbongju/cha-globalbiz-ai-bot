@@ -46,9 +46,9 @@ function Hero() {
 
         <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}
           className="text-lg md:text-xl text-white/80 max-w-2xl leading-relaxed mb-10">
-          Join CHA University's newest major designed for international students
-          who want to lead the next era of AI-driven business — taught entirely in English,
-          backed by Korea's leading bio-healthcare network.
+          An English-taught major at CHA University, where AI co-designs strategy and
+          bio-healthcare anchors expertise — preparing the next generation of leaders who can
+          bridge strategic intent and technological execution across cultures and markets.
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
@@ -70,16 +70,16 @@ function Hero() {
         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.5 }}
           className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
           {[
-            { num: '100%', label: 'English-taught' },
-            { num: '12+', label: 'Partner Countries' },
-            { num: '60+', label: 'Years of CHA Legacy' },
-            { num: '#1', label: 'Bio-Healthcare in Korea' },
+            { title: 'English-taught',     sub: 'Every course in English' },
+            { title: 'AI as Strategic Lens', sub: 'Not a supporting tool' },
+            { title: 'Bio-Healthcare Anchor', sub: 'CHA hospital ecosystem' },
+            { title: 'Global Career Pathway', sub: 'Korea + Asian markets' },
           ].map(s => (
-            <div key={s.label} className="border-l-2 border-[#d4a574] pl-4">
-              <div className="text-3xl md:text-4xl font-bold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
-                {s.num}
+            <div key={s.title} className="border-l-2 border-[#d4a574] pl-4">
+              <div className="text-lg md:text-xl font-bold text-white leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+                {s.title}
               </div>
-              <div className="text-xs md:text-sm text-white/70 mt-1 uppercase tracking-wider">{s.label}</div>
+              <div className="text-xs md:text-sm text-white/70 mt-2 uppercase tracking-wider">{s.sub}</div>
             </div>
           ))}
         </motion.div>
@@ -125,19 +125,19 @@ function PreviewAbout() {
             </div>
             <h2 className="text-4xl md:text-5xl font-bold leading-tight text-[#0a1e3f] mb-6"
               style={{ fontFamily: "'Playfair Display', serif" }}>
-              A dream worth<br />four years of your life
+              The convergence<br />that defines tomorrow
             </h2>
             <p className="text-lg text-gray-700 leading-relaxed mb-8">
-              The <strong className="text-[#0a1e3f]">Global Business AI Major</strong> at CHA University is more than a degree —
-              it is a journey designed for ambitious international students who want to lead
-              business transformation in the age of AI.
+              Leaders who command only conventional management knowledge — or only technical
+              expertise — can no longer navigate environments in which AI <strong className="text-[#0a1e3f]">co-designs strategy</strong> and
+              global volatility has become the operating norm. At CHA, you become fluent in both.
             </p>
             <div className="grid sm:grid-cols-2 gap-3 mb-8">
               {[
-                { icon: Globe2, label: 'English-only Curriculum' },
-                { icon: Users, label: 'Small Class Size (≤25)' },
-                { icon: BrainCircuit, label: 'Hands-on AI Projects' },
-                { icon: Briefcase, label: 'Industry Internships' },
+                { icon: Globe2,       label: 'English-only curriculum' },
+                { icon: BrainCircuit, label: 'AI as strategic lens' },
+                { icon: Briefcase,    label: 'Bio-healthcare ecosystem' },
+                { icon: Users,        label: 'Live laboratory of Korea\'s industries' },
               ].map(f => (
                 <div key={f.label} className="flex items-center gap-3 p-3 rounded-xl bg-white shadow-sm">
                   <f.icon className="text-[#d4a574]" size={20} />
@@ -158,9 +158,9 @@ function PreviewAbout() {
 
 function Pillars() {
   const pillars = [
-    { icon: BrainCircuit, title: 'AI Foundations',  desc: 'Machine learning, NLP, computer vision, generative AI — all built around real business cases.', to: '/curriculum', color: 'from-[#0a1e3f] to-[#1a3567]' },
-    { icon: Briefcase,    title: 'Business Strategy', desc: 'Marketing, finance, operations, entrepreneurship — taught through global case studies.',         to: '/curriculum', color: 'from-[#d4a574] to-[#c19463]' },
-    { icon: Globe2,       title: 'Global Fluency',   desc: 'Multilingual communication, cross-cultural leadership, international internships.',                to: '/career',     color: 'from-[#e8775c] to-[#c95a44]' },
+    { icon: BrainCircuit, title: 'AI Fluency',           desc: 'Master AI as a strategic lens, not a supporting tool — from algorithmic competition to platform economics that define modern enterprise.', to: '/major', color: 'from-[#0a1e3f] to-[#1a3567]' },
+    { icon: Briefcase,    title: 'Global Business',      desc: 'Strategic judgment across cultures, markets, and disciplines — grounded in Korea\'s most dynamic export-driven economy.',                to: '/major', color: 'from-[#d4a574] to-[#c19463]' },
+    { icon: Globe2,       title: 'Bio-Healthcare Anchor', desc: 'Direct engagement with CHA\'s hospital networks, biotech ventures, and clinical research — Korea\'s frontier of life sciences.',           to: '/career', color: 'from-[#e8775c] to-[#c95a44]' },
   ]
   return (
     <section className="py-32 bg-white">

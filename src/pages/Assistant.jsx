@@ -3,11 +3,11 @@ import { Sparkles, Send, User, Bot, Video, Mic, MessageSquare } from 'lucide-rea
 import PageHero from '../components/PageHero'
 
 const SAMPLE_REPLIES = [
-  "Great question! The Global Business AI major focuses on three pillars: AI foundations, business strategy, and global fluency. Each year builds on the previous one — by graduation, you'll have hands-on AI products in your portfolio and a global network of mentors.",
-  "Our curriculum is taught entirely in English, but we also offer Korean language electives if you'd like to immerse yourself in the local culture.",
-  "Internships start in Year 3. We have partnerships with 30+ companies including Samsung, Google Korea, and the CHA Bio-Group network.",
-  "Tuition for international students is roughly USD 7,000 per semester. Scholarships are available for top applicants — please ask the admissions team for details.",
-  "Yes, we provide full visa support. Most international students apply for the D-2 student visa, and graduates pursuing employment in Korea can transition to the E-7 visa.",
+  "Great question! The Global Business AI major rests on three pillars: AI Fluency, Global Business, and Bio-Healthcare Anchor. AI is treated as the strategic lens of modern enterprise — not a supporting tool — and bio-healthcare grounds your expertise in CHA's hospital and biotech ecosystem.",
+  "Our curriculum is taught entirely in English. Learning here means immersion in Korea's most advanced export industries — semiconductors, batteries, biopharmaceuticals, K-content, and more — with bio-healthcare as the anchoring domain.",
+  "Through CHA's deep specialization in bio-healthcare, students directly engage with university hospitals, fertility centers, biotech ventures, and clinical research institutes operating on the global frontier of life sciences.",
+  "Career pathways extend across global pharmaceutical and biotech corporations, digital health ventures, semiconductor and battery enterprises, healthcare consulting firms, life-science investment, and public policy agencies. International students gain a strategic gateway to Korean and broader Asian markets.",
+  "Specific admission cycle dates, quotas, and tuition details are confirmed each cycle. Please contact our admissions team or reach out through the contact form on the Admission page — we respond within 48 hours.",
 ]
 
 export default function Assistant() {

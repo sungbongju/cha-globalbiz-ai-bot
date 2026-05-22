@@ -15,9 +15,9 @@ export default function Admission() {
 
   const steps = [
     { num: '01', title: 'Submit Online Application', desc: 'Complete the application form and upload your transcripts and personal statement.' },
-    { num: '02', title: 'English Proficiency Test',   desc: 'TOEFL 80+, IELTS 6.5+, or equivalent. Waivers available for native English speakers.' },
-    { num: '03', title: 'Interview (Online)',          desc: 'A 30-minute conversation with the program chair. We want to know who you are.' },
-    { num: '04', title: 'Decision & Onboarding',       desc: 'Receive your decision within 4 weeks. Welcome package and visa support follow.' },
+    { num: '02', title: 'English Proficiency',       desc: 'Provide proof of English proficiency. Specific requirements will be confirmed during application.' },
+    { num: '03', title: 'Interview (Online)',         desc: 'A conversation with the program faculty. We want to know who you are and what you want to build.' },
+    { num: '04', title: 'Decision & Onboarding',      desc: 'Receive your decision, then begin the welcome and visa support process.' },
   ]
 
   return (
@@ -25,36 +25,42 @@ export default function Admission() {
       <PageHero
         eyebrow="Admissions"
         title="Apply to Global Business AI"
-        subtitle="We welcome students from all over the world. Application is open year-round
-          with two cohorts per year (March and September)."
+        subtitle="We welcome students from all over the world. Specific cohort dates, quotas,
+          and tuition details are confirmed each admission cycle — please contact our admissions team for current information."
       />
 
-      {/* 모집 일정 */}
+      {/* 모집 안내 */}
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-12">
             <Calendar className="mx-auto text-[#d4a574] mb-4" size={36} />
-            <h2 className="text-3xl font-bold text-[#0a1e3f]"
+            <h2 className="text-3xl font-bold text-[#0a1e3f] mb-3"
               style={{ fontFamily: "'Playfair Display', serif" }}>
-              Next Cohorts
+              Admission Cycles
             </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              The Global Business AI Major welcomes international students through scheduled
+              admission cycles. Reach out to our team for the current cycle's dates and details.
+            </p>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="p-8 rounded-2xl bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] text-white">
-              <div className="text-xs uppercase tracking-widest text-[#d4a574] font-semibold mb-2">Spring 2027</div>
-              <div className="text-3xl font-bold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
-                March 2027
+              <div className="text-xs uppercase tracking-widest text-[#d4a574] font-semibold mb-2">Spring Intake</div>
+              <div className="text-3xl font-bold mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Spring Semester
               </div>
-              <div className="text-sm text-white/70 mb-4">Application deadline: Nov 30, 2026</div>
-              <div className="text-sm text-white/80">Quota: 25 international students</div>
+              <div className="text-sm text-white/80 leading-relaxed">
+                Start the academic year with the first cohort. Applications typically open in autumn of the preceding year.
+              </div>
             </div>
             <div className="p-8 rounded-2xl bg-gradient-to-br from-[#d4a574] to-[#c19463] text-white">
-              <div className="text-xs uppercase tracking-widest text-white/80 font-semibold mb-2">Fall 2027</div>
-              <div className="text-3xl font-bold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
-                September 2027
+              <div className="text-xs uppercase tracking-widest text-white/80 font-semibold mb-2">Fall Intake</div>
+              <div className="text-3xl font-bold mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Fall Semester
               </div>
-              <div className="text-sm text-white/80 mb-4">Application deadline: Apr 30, 2027</div>
-              <div className="text-sm text-white/90">Quota: 25 international students</div>
+              <div className="text-sm text-white/90 leading-relaxed">
+                Join mid-academic-year with a tailored onboarding. Applications typically open in spring of the same year.
+              </div>
             </div>
           </div>
         </div>

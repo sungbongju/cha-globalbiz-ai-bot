@@ -9,48 +9,48 @@ const years = [
     title: 'Foundations',
     theme: 'Building the language of business and AI.',
     courses: [
-      { name: 'Introduction to Business', credit: 3 },
-      { name: 'Statistics for Business',  credit: 3 },
-      { name: 'Academic English I & II',  credit: 6 },
-      { name: 'Programming Basics (Python)', credit: 3 },
-      { name: 'Korean Society & Culture',  credit: 2 },
-      { name: 'Korean Language I',         credit: 3 },
+      { name: 'Introduction to Global Business',   type: 'Core' },
+      { name: 'Statistics for Business',           type: 'Core' },
+      { name: 'Academic English',                  type: 'Core' },
+      { name: 'Programming Foundations (Python)',  type: 'Core' },
+      { name: 'Bio-Healthcare Industry Overview',  type: 'Core' },
+      { name: 'Korean Society & Culture',          type: 'Elective' },
     ],
   },
   {
     year: 'Year 2',
     title: 'AI Core',
-    theme: 'Master the AI toolkit that powers modern business.',
+    theme: 'Master AI as the strategic lens of modern enterprise.',
     courses: [
-      { name: 'Machine Learning',          credit: 3 },
-      { name: 'Data Analytics & Visualization', credit: 3 },
-      { name: 'Marketing in the Digital Age',   credit: 3 },
-      { name: 'Financial Accounting',           credit: 3 },
-      { name: 'AI Ethics & Society',            credit: 2 },
-      { name: 'Korean Language II',             credit: 3 },
+      { name: 'Machine Learning for Business',     type: 'Core' },
+      { name: 'Data Analytics & Visualization',    type: 'Core' },
+      { name: 'Digital Marketing & Platform Economics', type: 'Core' },
+      { name: 'Financial Accounting & FinTech',    type: 'Core' },
+      { name: 'AI Ethics & Governance',            type: 'Core' },
+      { name: 'Korean Language',                   type: 'Elective' },
     ],
   },
   {
     year: 'Year 3',
     title: 'Specialization',
-    theme: 'Choose your industry path and go deep.',
+    theme: 'Anchor your expertise in bio-healthcare or advanced manufacturing.',
     courses: [
-      { name: 'Natural Language Processing',     credit: 3 },
-      { name: 'AI for Healthcare Business',      credit: 3 },
-      { name: 'Strategic Management',            credit: 3 },
-      { name: 'Global Finance & FinTech',        credit: 3 },
-      { name: 'Industry Internship Track',       credit: 6 },
+      { name: 'Generative AI & LLMs',              type: 'Core' },
+      { name: 'AI for Bio-Healthcare Business',    type: 'Specialization' },
+      { name: 'Strategic Management Across Cultures', type: 'Core' },
+      { name: 'Global Finance & Life-Science Investment', type: 'Specialization' },
+      { name: 'Industry Internship Track',         type: 'Lab' },
     ],
   },
   {
     year: 'Year 4',
     title: 'Capstone',
-    theme: 'Build the thing. Launch the career.',
+    theme: 'Build the thing. Lead the industry.',
     courses: [
-      { name: 'Capstone Project (Full Year)',    credit: 6 },
-      { name: 'Entrepreneurship Lab',            credit: 3 },
-      { name: 'Global Internship Program',       credit: 6 },
-      { name: 'Career Studio & Portfolio',       credit: 3 },
+      { name: 'Capstone Project (Full Year)',      type: 'Lab' },
+      { name: 'Entrepreneurship & Venture Building', type: 'Lab' },
+      { name: 'Global Internship Program',         type: 'Lab' },
+      { name: 'Career Studio & Portfolio',         type: 'Lab' },
     ],
   },
 ]
@@ -106,14 +106,20 @@ export default function Curriculum() {
                     <ChevronRight size={16} className="text-[#d4a574]" />
                     <span className="font-medium">{c.name}</span>
                   </div>
-                  <span className="text-xs text-white/60 font-mono">{c.credit} credits</span>
+                  <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded
+                    ${c.type === 'Core' ? 'bg-[#d4a574]/20 text-[#d4a574]'
+                      : c.type === 'Specialization' ? 'bg-[#e8775c]/20 text-[#e8775c]'
+                      : c.type === 'Lab' ? 'bg-emerald-500/20 text-emerald-300'
+                      : 'bg-white/10 text-white/60'}`}>
+                    {c.type}
+                  </span>
                 </div>
               ))}
             </div>
 
             <div className="mt-12 text-center">
               <div className="text-sm text-white/60 mb-4">
-                Total: {y.courses.reduce((s, c) => s + c.credit, 0)} credits
+                Specific course catalogues are updated each academic year.
               </div>
               {active < years.length - 1 && (
                 <button onClick={() => setActive(active + 1)}
