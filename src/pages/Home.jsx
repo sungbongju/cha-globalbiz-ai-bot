@@ -1,12 +1,14 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import {
   Globe2, BrainCircuit, Sparkles, ArrowRight,
-  Users, Briefcase, MessageCircle, ChevronRight, Award
+  Users, Briefcase, MessageCircle, ChevronRight, Award, Play
 } from 'lucide-react'
+import VideoModal from '../components/VideoModal'
 
 // ── Hero ──
-function Hero() {
+function Hero({ onWatchVideo }) {
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [0, 500], [0, 150])
   const opacity = useTransform(scrollY, [0, 400], [1, 0])
@@ -53,12 +55,18 @@ function Hero() {
 
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
           className="flex flex-wrap gap-4">
-          <Link to="/assistant" className="group inline-flex items-center gap-2 px-7 py-4 rounded-full
+          <button onClick={onWatchVideo} className="group inline-flex items-center gap-2 px-7 py-4 rounded-full
             bg-[#d4a574] text-white font-semibold shadow-2xl shadow-[#d4a574]/30
             hover:bg-[#c19463] transition">
+            <Play size={18} className="fill-white" />
+            Watch Welcome Message
+            <ArrowRight size={16} className="group-hover:translate-x-1 transition" />
+          </button>
+          <Link to="/assistant" className="inline-flex items-center gap-2 px-7 py-4 rounded-full
+            bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold
+            hover:bg-white/20 transition">
             <MessageCircle size={18} />
             Ask our AI Assistant
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition" />
           </Link>
           <Link to="/about" className="inline-flex items-center gap-2 px-7 py-4 rounded-full
             bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold
@@ -244,12 +252,15 @@ function AssistantCTA() {
 }
 
 export default function Home() {
+  const [videoOpen, setVideoOpen] = useState(false)
+
   return (
     <>
-      <Hero />
+      <Hero onWatchVideo={() => setVideoOpen(true)} />
       <PreviewAbout />
       <Pillars />
       <AssistantCTA />
+      <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
     </>
   )
 }

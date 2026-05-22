@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom'
-import { Globe2, Users, BrainCircuit, Briefcase, Heart, Award, ArrowRight } from 'lucide-react'
+import { Globe2, Users, BrainCircuit, Briefcase, Heart, Award, ArrowRight, ExternalLink } from 'lucide-react'
 import PageHero from '../components/PageHero'
+
+const HEYGEN_VIDEO_ID = '20da7e9eb6744407b710bf226ec0ee43'
+const HEYGEN_EMBED_URL = `https://app.heygen.com/embeds/${HEYGEN_VIDEO_ID}`
+const HEYGEN_DIRECT_URL = `https://app.heygen.com/videos/welcome-to-global-business-ai-at-cha-university-${HEYGEN_VIDEO_ID}`
 
 export default function About() {
   return (
@@ -11,6 +15,38 @@ export default function About() {
         subtitle="Welcome to the Global Business AI Major at the College of Future Convergence,
           CHA University. We sincerely welcome everyone visiting our homepage."
       />
+
+      {/* 환영 영상 (박교수님 HeyGen) */}
+      <section className="py-20 bg-[#faf8f3]">
+        <div className="max-w-5xl mx-auto px-6 lg:px-10">
+          <div className="text-center mb-8">
+            <div className="text-sm uppercase tracking-widest text-[#d4a574] font-semibold mb-3">
+              A Welcome from Prof. Park
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0a1e3f]"
+              style={{ fontFamily: "'Playfair Display', serif" }}>
+              Hear it directly from the Program Chair
+            </h2>
+          </div>
+          <div className="relative w-full pb-[56.25%] rounded-2xl overflow-hidden shadow-2xl bg-black">
+            <iframe
+              src={HEYGEN_EMBED_URL}
+              title="Welcome to Global Business AI at CHA University"
+              className="absolute inset-0 w-full h-full"
+              frameBorder="0"
+              allow="autoplay; encrypted-media; fullscreen"
+              allowFullScreen
+            />
+          </div>
+          <div className="mt-3 text-center text-xs text-gray-500">
+            영상이 보이지 않으면{' '}
+            <a href={HEYGEN_DIRECT_URL} target="_blank" rel="noopener noreferrer"
+              className="text-[#d4a574] hover:underline inline-flex items-center gap-1">
+              HeyGen에서 직접 보기 <ExternalLink size={11} />
+            </a>
+          </div>
+        </div>
+      </section>
 
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
