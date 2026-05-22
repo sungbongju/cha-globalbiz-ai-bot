@@ -2,46 +2,116 @@ import { Link } from 'react-router-dom'
 import { Mail, ArrowRight, Phone } from 'lucide-react'
 import PageHero from '../components/PageHero'
 
+// 차의대 글로벌융합학부 글로벌비즈AI 전공 — 공식 교수진 9명
+// 사진: 실제 차의대 사진으로 교체 권장 (현재 placeholder)
+// 박교수님이 보내주시면 public/faculty/ 에 저장 후 경로 변경
+
 const faculty = [
+  // ─── Business Management Track ───
   {
-    name: 'Prof. Park Dae-Geun',
+    name: 'Prof. Dae Keun Park',
+    nameKo: '박대근',
     role: 'Program Chair',
+    track: 'Business Management',
     img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80&auto=format&fit=crop',
     edu: 'Ph.D., Management Engineering, KAIST',
-    research: 'AI for Business · Statistical Learning · Educational Chatbots · Time Series Forecasting',
+    research: 'Finance · Time Series Forecasting · Generative AI · Healthcare Convergence',
     career: 'Accenture · KPMG · NICE',
+    teaches: 'Financial Management · Financial Markets · Investment Analysis',
     email: 'dkpark@cha.ac.kr',
     phone: '+82-31-850-8984',
   },
   {
-    name: 'Faculty TBA',
-    role: 'AI & Data Science',
-    img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80&auto=format&fit=crop',
-    edu: 'Coming soon',
-    research: 'Machine Learning, NLP, Generative AI',
-    career: '',
-    email: '',
-    phone: '',
-  },
-  {
-    name: 'Faculty TBA',
-    role: 'Global Business Strategy',
+    name: 'Prof. Tae Dong Kim',
+    nameKo: '김태동',
+    role: 'Dean of Graduate School',
+    track: 'Business Management',
     img: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&q=80&auto=format&fit=crop',
-    edu: 'Coming soon',
-    research: 'International Marketing, Cross-cultural Management',
+    edu: 'Ph.D., Accounting & Taxation',
+    research: 'Accounting · Taxation · Financial Reporting',
     career: '',
-    email: '',
-    phone: '',
+    teaches: 'Principles of Accounting · Financial Accounting · Cost & Managerial Accounting',
+    email: 'ktdong@cha.ac.kr',
+    phone: '+82-31-850-8967',
   },
   {
-    name: 'Faculty TBA',
-    role: 'Industry Liaison',
-    img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80&auto=format&fit=crop',
-    edu: 'Coming soon',
-    research: 'Startup Mentorship, Industry Partnerships',
+    name: 'Prof. Joo Hun Kim',
+    nameKo: '김주헌',
+    role: 'Professor',
+    track: 'Business Management',
+    img: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400&q=80&auto=format&fit=crop',
+    edu: 'Ph.D., International Business',
+    research: 'International Business · International Marketing',
     career: '',
-    email: '',
-    phone: '',
+    teaches: 'Introduction to Business · International Marketing · International Business',
+    email: 'jkim@cha.ac.kr',
+    phone: '+82-31-850-8966',
+  },
+  {
+    name: 'Prof. Eok Hwan Kim',
+    nameKo: '김억환',
+    role: 'Professor',
+    track: 'Business Management',
+    img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80&auto=format&fit=crop',
+    edu: 'Ph.D., Human Resources & Strategy',
+    research: 'Human Resources · Organizational Behavior · Strategic Management',
+    career: '',
+    teaches: 'Organizational Behavior · Healthcare Management · Human Resource Management',
+    email: 'ekim@cha.ac.kr',
+    phone: '+82-31-850-8968',
+  },
+  {
+    name: 'Prof. Hee Jung Lee',
+    nameKo: '이희정',
+    role: 'Professor',
+    track: 'Business Management',
+    img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80&auto=format&fit=crop',
+    edu: 'Ph.D., Marketing',
+    research: 'Marketing · Tourism Psychology · Services',
+    career: '',
+    teaches: 'Principles of Marketing · Services Marketing · Consumer Psychology',
+    email: 'hjlee@cha.ac.kr',
+    phone: '+82-31-850-8969',
+  },
+  // ─── AI Medical Data Science Track ───
+  {
+    name: 'Prof. Jang Pyo Bae',
+    nameKo: '배장표',
+    role: 'Professor',
+    track: 'AI Medical Data Science',
+    img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80&auto=format&fit=crop',
+    edu: 'Ph.D., AI Biomedical Engineering',
+    research: 'AI Biomedical Engineering · Machine Learning · Generative AI',
+    career: '',
+    teaches: 'Advanced Python · Machine Learning · Introduction to AI · App Development',
+    email: 'haizzzi@cha.ac.kr',
+    phone: '+82-31-850-8956',
+  },
+  {
+    name: 'Prof. Sang Min Lee',
+    nameKo: '이상민',
+    role: 'Professor (Joint)',
+    track: 'AI · Business (Bridge)',
+    img: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&q=80&auto=format&fit=crop',
+    edu: 'Ph.D., Data Science',
+    research: 'Data Science · Business Analytics · Management Science',
+    career: '',
+    teaches: 'Python Programming Basics (cross-track foundation)',
+    email: 'slee@cha.ac.kr',
+    phone: '+82-31-850-8993',
+  },
+  {
+    name: 'Prof. Kyung In Jung',
+    nameKo: '정경인',
+    role: 'Professor',
+    track: 'AI Medical Data Science',
+    img: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&q=80&auto=format&fit=crop',
+    edu: 'Ph.D., Public Health · Pharmacy',
+    research: 'Public Health · Epidemiology · Healthcare Data Analytics',
+    career: 'Researcher, Seoul National University Institute of Health and Environment',
+    teaches: 'Healthcare Data Analytics',
+    email: 'jki0515@cha.ac.kr',
+    phone: '+82-31-850-9087',
   },
 ]
 
@@ -58,49 +128,77 @@ export default function Faculty() {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid md:grid-cols-2 gap-6">
-            {faculty.map(f => (
-              <div key={f.name} className="p-8 rounded-2xl bg-[#faf8f3] border border-gray-100
-                hover:shadow-xl transition">
-                <div className="flex items-start gap-5">
-                  <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-lg flex-shrink-0
-                    ring-2 ring-[#d4a574]/30">
-                    <img
-                      src={f.img}
-                      alt={f.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-bold text-[#0a1e3f] mb-1"
-                      style={{ fontFamily: "'Playfair Display', serif" }}>
-                      {f.name}
-                    </h3>
-                    <div className="text-sm text-[#d4a574] font-semibold mb-3">{f.role}</div>
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <div><span className="font-semibold text-[#0a1e3f]">Education:</span> {f.edu}</div>
-                      <div><span className="font-semibold text-[#0a1e3f]">Research:</span> {f.research}</div>
-                      {f.career && (
-                        <div><span className="font-semibold text-[#0a1e3f]">Career:</span> {f.career}</div>
-                      )}
+            {faculty.map(f => {
+              const isAI = f.track.includes('AI Medical')
+              const isBridge = f.track.includes('Bridge')
+              const trackColor = isBridge
+                ? 'from-fuchsia-500 to-[#d4a574]'
+                : isAI
+                  ? 'from-fuchsia-500 to-cyan-400'
+                  : 'from-[#d4a574] to-[#e8775c]'
+              const trackTag = isBridge
+                ? 'bg-gradient-to-r from-fuchsia-100 to-amber-100 text-[#0a1e3f]'
+                : isAI
+                  ? 'bg-fuchsia-100 text-fuchsia-900 ring-1 ring-fuchsia-300'
+                  : 'bg-[#d4a574]/20 text-[#7a4f24] ring-1 ring-[#d4a574]/40'
+              return (
+                <div key={f.name} className="group relative p-7 rounded-2xl bg-white border border-gray-100
+                  hover:shadow-2xl hover:border-[#d4a574]/40 transition-all duration-300 overflow-hidden">
+                  {/* 트랙 stripe */}
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${trackColor}`} />
+
+                  <div className="flex items-start gap-5">
+                    <div className={`w-24 h-24 rounded-2xl overflow-hidden shadow-lg flex-shrink-0
+                      ring-2 ring-offset-2 ${isAI ? 'ring-fuchsia-300' : 'ring-[#d4a574]/40'}`}>
+                      <img
+                        src={f.img}
+                        alt={f.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
                     </div>
-                    {(f.email || f.phone) && (
-                      <div className="mt-4 pt-4 border-t border-gray-200 flex flex-wrap gap-4 text-xs">
-                        {f.email && (
-                          <a href={`mailto:${f.email}`} className="inline-flex items-center gap-1 text-[#0a1e3f] hover:text-[#d4a574] transition">
-                            <Mail size={12} /> {f.email}
-                          </a>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-baseline gap-2 mb-1">
+                        <h3 className="text-xl font-bold text-[#0a1e3f]"
+                          style={{ fontFamily: "'Playfair Display', serif" }}>
+                          {f.name}
+                        </h3>
+                        <span className="text-sm text-gray-400 font-normal">({f.nameKo})</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 mb-3">
+                        <span className="text-sm text-[#d4a574] font-semibold">{f.role}</span>
+                      </div>
+                      <span className={`inline-block text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded mb-3 ${trackTag}`}>
+                        {f.track}
+                      </span>
+                      <div className="space-y-1.5 text-sm text-gray-600">
+                        <div><span className="font-semibold text-[#0a1e3f]">Education:</span> {f.edu}</div>
+                        <div><span className="font-semibold text-[#0a1e3f]">Research:</span> {f.research}</div>
+                        {f.teaches && (
+                          <div><span className="font-semibold text-[#0a1e3f]">Teaches:</span> {f.teaches}</div>
                         )}
-                        {f.phone && (
-                          <a href={`tel:${f.phone.replace(/\D/g, '')}`} className="inline-flex items-center gap-1 text-[#0a1e3f] hover:text-[#d4a574] transition">
-                            <Phone size={12} /> {f.phone}
-                          </a>
+                        {f.career && (
+                          <div><span className="font-semibold text-[#0a1e3f]">Career:</span> {f.career}</div>
                         )}
                       </div>
-                    )}
+                      {(f.email || f.phone) && (
+                        <div className="mt-4 pt-4 border-t border-gray-200 flex flex-wrap gap-4 text-xs">
+                          {f.email && (
+                            <a href={`mailto:${f.email}`} className="inline-flex items-center gap-1 text-[#0a1e3f] hover:text-[#d4a574] transition">
+                              <Mail size={12} /> {f.email}
+                            </a>
+                          )}
+                          {f.phone && (
+                            <a href={`tel:${f.phone.replace(/\D/g, '')}`} className="inline-flex items-center gap-1 text-[#0a1e3f] hover:text-[#d4a574] transition">
+                              <Phone size={12} /> {f.phone}
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
