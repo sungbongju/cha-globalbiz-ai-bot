@@ -153,7 +153,7 @@ export default function Faculty() {
                       <img
                         src={f.img}
                         alt={f.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
