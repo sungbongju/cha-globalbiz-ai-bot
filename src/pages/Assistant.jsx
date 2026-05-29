@@ -8,6 +8,8 @@ import {
   stopLiveAvatarSession,
   keepAliveLiveAvatar,
 } from '../lib/liveavatar'
+import { MicRecorder, isMicRecorderSupported } from '../lib/stt'
+import { speak as ttsSpeak, stopSpeaking as ttsStop } from '../lib/tts'
 
 const SAMPLE_REPLIES = [
   "Great question! The Global Business AI major rests on three pillars: AI Fluency, Global Business, and Bio-Healthcare Anchor. AI is treated as the strategic lens of modern enterprise — not a supporting tool — and bio-healthcare grounds your expertise in CHA's hospital and biotech ecosystem.",
@@ -45,6 +47,16 @@ export default function Assistant() {
   const avatarAudioTrackRef = useRef(null)
   const keepAliveIntervalRef = useRef(null)
   const isSpeakingRef = useRef(false)
+
+  // ─── Voice Mode (STS) state — Middleton Whisper STT + OmniVoice TTS ───
+  // No avatar / no LiveAvatar credits: mic → /api/stt → reply → /api/tts → play.
+  const [voiceActive, setVoiceActive] = useState(false)        // mic session running
+  const [voiceState, setVoiceState] = useState('idle')         // idle | listening | thinking | speaking
+  const [voiceError, setVoiceError] = useState('')             // mic permission / support message
+  const [voiceHeard, setVoiceHeard] = useState('')             // last transcribed user text
+  const [voiceReply, setVoiceReply] = useState('')             // last spoken reply text
+  const micRecorderRef = useRef(null)
+  const voiceBusyRef = useRef(false)                           // thinking/speaking guard (echo)
 
   // ─── User webcam: start / stop / sync (ported from cha-interview-bot-liveavatar) ───
   const startUserCamera = useCallback(async () => {
@@ -98,6 +110,106 @@ export default function Assistant() {
       setTyping(false)
     }, 1000 + Math.random() * 800)
   }
+
+  // ─── Voice Mode (STS): handle a finished transcript ──────────────────
+  // user speech → text (already done by MicRecorder) → reply → OmniVoice → play.
+  // Reply text reuses SAMPLE_REPLIES for this pass (RAG/LLM hookup is later work).
+  const handleVoiceTranscript = useCallback(async (rawText) => {
+    const text = (rawText || '').trim()
+    if (!text || text.length < 2) return
+    // Echo guard: ignore mic input while we're thinking/speaking.
+    if (voiceBusyRef.current) return
+
+    voiceBusyRef.current = true
+    setVoiceHeard(text)
+    setVoiceReply('')
+    setVoiceState('thinking')
+
+    // Pause the mic so OmniVoice playback doesn't get re-transcribed.
+    micRecorderRef.current?.pause()
+
+    const reply = SAMPLE_REPLIES[Math.floor(Math.random() * SAMPLE_REPLIES.length)]
+    setVoiceReply(reply)
+    setVoiceState('speaking')
+
+    try {
+      await ttsSpeak(reply)   // POST /api/tts (Middleton OmniVoice) → play WAV
+    } catch (e) {
+      console.warn('[voice] TTS playback failed:', e)
+      setVoiceError('Could not play the voice response. Please try again.')
+    } finally {
+      voiceBusyRef.current = false
+      // Resume listening if the session is still active.
+      const rec = micRecorderRef.current
+      if (rec && rec.isRunning) {
+        rec.resume()
+        setVoiceState('listening')
+      } else {
+        setVoiceState('idle')
+      }
+    }
+  }, [])
+
+  // ─── Voice Mode: start mic session ───────────────────────────────────
+  const startVoice = useCallback(async () => {
+    setVoiceError('')
+    if (!isMicRecorderSupported()) {
+      setVoiceError('This browser does not support voice input. Try the latest Chrome or Safari, or use Text Chat.')
+      return
+    }
+    const rec = new MicRecorder({
+      sttEndpoint: '/api/stt',
+      onTranscript: (t) => handleVoiceTranscript(t),
+      onError: (err) => console.warn('[voice] MicRecorder error:', err),
+      onStateChange: (st) => {
+        // Reflect recorder state unless we're mid reply (thinking/speaking).
+        if (voiceBusyRef.current) return
+        if (st === 'listening' || st === 'recording' || st === 'transcribing') {
+          setVoiceState('listening')
+        }
+      },
+    })
+    micRecorderRef.current = rec
+    try {
+      await rec.start()
+      setVoiceActive(true)
+      setVoiceState('listening')
+    } catch (e) {
+      console.warn('[voice] start failed:', e)
+      micRecorderRef.current = null
+      const denied = e?.name === 'NotAllowedError' || /denied|permission|allowed/i.test(e?.message || '')
+      setVoiceError(
+        denied
+          ? 'Microphone permission is needed. Click the lock icon in your browser address bar and allow the microphone.'
+          : 'Could not start the microphone. Make sure no other app is using it, then try again.'
+      )
+      setVoiceActive(false)
+      setVoiceState('idle')
+    }
+  }, [handleVoiceTranscript])
+
+  // ─── Voice Mode: stop mic session ────────────────────────────────────
+  const stopVoice = useCallback(() => {
+    try { ttsStop() } catch { /* ignore */ }
+    const rec = micRecorderRef.current
+    if (rec) {
+      try { rec.stop() } catch { /* ignore */ }
+      micRecorderRef.current = null
+    }
+    voiceBusyRef.current = false
+    setVoiceActive(false)
+    setVoiceState('idle')
+  }, [])
+
+  // Tear down the mic when leaving STS mode or unmounting.
+  // Only act when a recorder actually exists so we don't call setState
+  // synchronously on every unrelated mode render (cascading-render lint).
+  useEffect(() => {
+    if (mode !== 'sts' && micRecorderRef.current) stopVoice()
+  }, [mode, stopVoice])
+  useEffect(() => () => {
+    if (micRecorderRef.current) stopVoice()
+  }, [stopVoice])
 
   // ─── Avatar: speak helper ───────────────────────────
   const speakAvatar = useCallback((text) => {
@@ -394,23 +506,102 @@ export default function Assistant() {
             )}
 
             {mode === 'sts' && (
-              <div className="flex-1 flex items-center justify-center bg-[#faf8f3]">
-                <div className="text-center p-8">
-                  <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-[#d4a574] to-[#c19463]
-                    flex items-center justify-center mb-6 shadow-2xl">
-                    <Mic className="text-white" size={48} />
-                  </div>
-                  <h3 className="text-2xl font-bold text-[#0a1e3f] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    Voice Mode
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-6 max-w-md mx-auto">
-                    Coming soon — speak naturally and get instant voice responses.
-                  </p>
-                  <button onClick={() => setMode('ttt')}
-                    className="px-6 py-3 rounded-full bg-[#0a1e3f] text-white font-semibold hover:bg-[#1a3567] transition">
-                    Try Text Chat instead
-                  </button>
+              <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] p-8 overflow-y-auto">
+                {/* Circular visualizer / mic button */}
+                <button
+                  type="button"
+                  onClick={voiceActive ? stopVoice : startVoice}
+                  aria-label={voiceActive ? 'Stop voice mode' : 'Start voice mode'}
+                  className="relative w-36 h-36 rounded-full flex items-center justify-center mb-6
+                    transition shadow-2xl focus:outline-none focus:ring-4 focus:ring-[#d4a574]/40"
+                  style={{
+                    background:
+                      voiceState === 'speaking'
+                        ? 'radial-gradient(circle, #d4a574 0%, #c19463 100%)'
+                        : 'radial-gradient(circle, #1a3567 0%, #0a1e3f 100%)',
+                    border: '2px solid #d4a574',
+                  }}
+                >
+                  {/* Pulsing rings while listening / speaking */}
+                  {(voiceState === 'listening' || voiceState === 'speaking') && (
+                    <>
+                      <span className="absolute inset-0 rounded-full border-2 border-[#d4a574]/60 animate-ping" />
+                      <span className="absolute -inset-3 rounded-full border border-[#d4a574]/30 animate-pulse" />
+                    </>
+                  )}
+                  <Mic
+                    className={voiceState === 'speaking' ? 'text-[#0a1e3f]' : 'text-[#d4a574]'}
+                    size={52}
+                  />
+                </button>
+
+                {/* Status indicator */}
+                <div className="flex items-center gap-2 mb-2 text-white">
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      voiceState === 'listening' ? 'bg-green-400 animate-pulse'
+                        : voiceState === 'thinking' ? 'bg-yellow-400 animate-pulse'
+                        : voiceState === 'speaking' ? 'bg-[#d4a574] animate-pulse'
+                        : 'bg-gray-400'
+                    }`}
+                  />
+                  <span className="text-sm font-semibold tracking-wide">
+                    {voiceState === 'listening' ? 'Listening…'
+                      : voiceState === 'thinking' ? 'Thinking…'
+                      : voiceState === 'speaking' ? 'Speaking…'
+                      : 'Tap the mic to start'}
+                  </span>
                 </div>
+
+                <p className="text-white/60 text-xs mb-6 text-center max-w-sm">
+                  {voiceActive
+                    ? 'Speak naturally — pause when you\'re done and I\'ll respond.'
+                    : 'Voice Mode uses on-prem Whisper + OmniVoice. Tap the mic and allow microphone access.'}
+                </p>
+
+                {/* Mic permission / error message */}
+                {voiceError && (
+                  <div className="mb-4 max-w-md text-center text-sm text-red-200 bg-red-900/40 border border-red-400/30 rounded-xl px-4 py-3">
+                    {voiceError}
+                  </div>
+                )}
+
+                {/* Transcript + reply so it's clear what was heard / said */}
+                {(voiceHeard || voiceReply) && (
+                  <div className="w-full max-w-md space-y-3">
+                    {voiceHeard && (
+                      <div className="flex gap-3 flex-row-reverse">
+                        <div className="w-8 h-8 rounded-full bg-white text-[#0a1e3f] flex items-center justify-center flex-shrink-0">
+                          <User size={14} />
+                        </div>
+                        <div className="max-w-[80%] p-3 rounded-2xl rounded-tr-sm bg-white text-[#0a1e3f] text-sm leading-relaxed">
+                          {voiceHeard}
+                        </div>
+                      </div>
+                    )}
+                    {voiceReply && (
+                      <div className="flex gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#d4a574] to-[#c19463] text-white flex items-center justify-center flex-shrink-0">
+                          <Bot size={14} />
+                        </div>
+                        <div className="max-w-[80%] p-3 rounded-2xl rounded-tl-sm bg-[#1a3567] text-white text-sm leading-relaxed">
+                          {voiceReply}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Stop button when active */}
+                {voiceActive && (
+                  <button
+                    onClick={stopVoice}
+                    className="mt-6 px-6 py-2.5 rounded-full bg-white/10 border border-white/20 text-white
+                      text-sm font-semibold hover:bg-white/20 transition"
+                  >
+                    End voice session
+                  </button>
+                )}
               </div>
             )}
 
