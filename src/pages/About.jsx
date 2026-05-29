@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom'
-import { Globe2, Users, BrainCircuit, Briefcase, Heart, Award, ArrowRight, ExternalLink } from 'lucide-react'
+import { Globe2, Users, BrainCircuit, Briefcase, Heart, Award, ArrowRight } from 'lucide-react'
 import PageHero from '../components/PageHero'
 
-const HEYGEN_VIDEO_ID = '20da7e9eb6744407b710bf226ec0ee43'
-const HEYGEN_EMBED_URL = `https://app.heygen.com/embeds/${HEYGEN_VIDEO_ID}`
-const HEYGEN_DIRECT_URL = `https://app.heygen.com/videos/welcome-to-global-business-ai-at-cha-university-${HEYGEN_VIDEO_ID}`
+// 박교수님 환영 영상 — 자체 호스팅 (HeyGen Creator 구독 해지해도 영구 재생)
+const WELCOME_VIDEO_SRC = '/welcome-prof-park.mp4'
 
 export default function About() {
   return (
@@ -29,21 +28,14 @@ export default function About() {
             </h2>
           </div>
           <div className="relative w-full pb-[56.25%] rounded-2xl overflow-hidden shadow-2xl bg-black">
-            <iframe
-              src={HEYGEN_EMBED_URL}
+            <video
+              src={WELCOME_VIDEO_SRC}
               title="Welcome to Global Business AI at CHA University"
-              className="absolute inset-0 w-full h-full"
-              frameBorder="0"
-              allow="autoplay; encrypted-media; fullscreen"
-              allowFullScreen
+              className="absolute inset-0 w-full h-full object-contain"
+              controls
+              playsInline
+              preload="metadata"
             />
-          </div>
-          <div className="mt-3 text-center text-xs text-gray-500">
-            영상이 보이지 않으면{' '}
-            <a href={HEYGEN_DIRECT_URL} target="_blank" rel="noopener noreferrer"
-              className="text-[#d4a574] hover:underline inline-flex items-center gap-1">
-              HeyGen에서 직접 보기 <ExternalLink size={11} />
-            </a>
           </div>
         </div>
       </section>
