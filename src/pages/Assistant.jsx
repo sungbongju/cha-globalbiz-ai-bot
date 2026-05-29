@@ -1,6 +1,13 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Sparkles, Send, User, Bot, Video, Mic, MessageSquare } from 'lucide-react'
 import PageHero from '../components/PageHero'
+import AvatarPanel from '../components/AvatarPanel'
+import {
+  createLiveAvatarSession,
+  sendAvatarCommand,
+  stopLiveAvatarSession,
+  keepAliveLiveAvatar,
+} from '../lib/liveavatar'
 
 const SAMPLE_REPLIES = [
   "Great question! The Global Business AI major rests on three pillars: AI Fluency, Global Business, and Bio-Healthcare Anchor. AI is treated as the strategic lens of modern enterprise — not a supporting tool — and bio-healthcare grounds your expertise in CHA's hospital and biotech ecosystem.",
@@ -10,6 +17,11 @@ const SAMPLE_REPLIES = [
   "Specific admission cycle dates, quotas, and tuition details are confirmed each cycle. Please contact our admissions team or reach out through the contact form on the Admission page — we respond within 48 hours.",
 ]
 
+const AVATAR_GREETING =
+  "Hi! I'm the GBA Assistant. Ask me anything about the Global Business AI major — courses, faculty, careers, or life in Korea."
+
+const INTERACTIVITY_TYPE = 'CONVERSATIONAL'
+
 export default function Assistant() {
   const [mode, setMode] = useState('ttt')   // 'ftf' | 'sts' | 'ttt'
   const [messages, setMessages] = useState([
@@ -18,6 +30,18 @@ export default function Assistant() {
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
   const endRef = useRef(null)
+
+  // ─── LiveAvatar (FTF) state ─────────────────────────
+  const [avatarStatus, setAvatarStatus] = useState('idle') // idle | connecting | connected | speaking
+  const [videoReady, setVideoReady] = useState(false)
+  const videoRef = useRef(null)
+  const audioRef = useRef(null)
+  const roomRef = useRef(null)
+  const sessionRef = useRef(null)
+  const avatarVideoTrackRef = useRef(null)
+  const avatarAudioTrackRef = useRef(null)
+  const keepAliveIntervalRef = useRef(null)
+  const isSpeakingRef = useRef(false)
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -35,6 +59,196 @@ export default function Assistant() {
       setTyping(false)
     }, 1000 + Math.random() * 800)
   }
+
+  // ─── Avatar: speak helper ───────────────────────────
+  const speakAvatar = useCallback((text) => {
+    if (!roomRef.current || !sessionRef.current || !text) return
+    isSpeakingRef.current = true
+    setAvatarStatus('speaking')
+    sendAvatarCommand(roomRef.current, 'avatar.speak_text', { text })
+  }, [])
+
+  // ─── Avatar: send a typed question while in avatar mode ───
+  // No globalbiz LLM backend yet — reuse SAMPLE_REPLIES so the avatar talks.
+  const sendAvatarMessage = useCallback((userText) => {
+    const text = (userText || '').trim()
+    if (!text) return
+    const reply = SAMPLE_REPLIES[Math.floor(Math.random() * SAMPLE_REPLIES.length)]
+    speakAvatar(reply)
+  }, [speakAvatar])
+
+  // ─── Avatar: attach subscribed tracks to media elements ───
+  const attachAvatarTracks = useCallback(() => {
+    if (avatarVideoTrackRef.current && videoRef.current) {
+      try {
+        avatarVideoTrackRef.current.attach(videoRef.current)
+        setVideoReady(true)
+      } catch (e) { console.warn('video attach error:', e) }
+    }
+    if (avatarAudioTrackRef.current && audioRef.current) {
+      try {
+        avatarAudioTrackRef.current.attach(audioRef.current)
+        audioRef.current.play?.().catch(() => {})
+      } catch (e) { console.warn('audio attach error:', e) }
+    }
+  }, [])
+
+  // ─── Avatar: stop / cleanup ─────────────────────────
+  const stopAvatar = useCallback(async () => {
+    isSpeakingRef.current = false
+    if (keepAliveIntervalRef.current) {
+      clearInterval(keepAliveIntervalRef.current)
+      keepAliveIntervalRef.current = null
+    }
+    if (sessionRef.current) {
+      await stopLiveAvatarSession(sessionRef.current.session_id)
+    }
+    if (roomRef.current) {
+      try { await roomRef.current.disconnect() } catch { /* ignore */ }
+      roomRef.current = null
+    }
+    sessionRef.current = null
+    avatarVideoTrackRef.current = null
+    avatarAudioTrackRef.current = null
+    setVideoReady(false)
+    setAvatarStatus('idle')
+  }, [])
+
+  // ─── Avatar: interrupt current speech ───────────────
+  const interruptAvatar = useCallback(() => {
+    if (sessionRef.current && roomRef.current) {
+      try { sendAvatarCommand(roomRef.current, 'avatar.interrupt') } catch (e) { console.error('interrupt error:', e) }
+    }
+    isSpeakingRef.current = false
+    setAvatarStatus('connected')
+  }, [])
+
+  // ─── Avatar: start session ──────────────────────────
+  const startAvatar = useCallback(async () => {
+    if (!window.LivekitClient) {
+      alert('LiveKit client failed to load. Please refresh and try again.')
+      return
+    }
+    setAvatarStatus('connecting')
+    try {
+      // avatar_id omitted → server uses LIVEAVATAR_AVATAR_ID
+      const sess = await createLiveAvatarSession({ interactivityType: INTERACTIVITY_TYPE })
+      sessionRef.current = sess
+
+      const room = new window.LivekitClient.Room({
+        adaptiveStream: true,
+        dynacast: true,
+        audioCaptureDefaults: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      })
+      roomRef.current = room
+
+      room.on(window.LivekitClient.RoomEvent.DataReceived, (payload, _participant, _kind, topic) => {
+        try {
+          const evt = JSON.parse(new TextDecoder().decode(payload))
+          const type = evt.event_type || evt.type || ''
+          if (topic && topic !== 'agent-response') return
+          if (type === 'avatar.speak_started') {
+            isSpeakingRef.current = true
+            setAvatarStatus('speaking')
+          }
+          if (type === 'avatar.speak_ended') {
+            isSpeakingRef.current = false
+            setAvatarStatus('connected')
+          }
+        } catch (e) {
+          console.warn('[LA] DataReceived parse error:', e)
+        }
+      })
+
+      room.on(window.LivekitClient.RoomEvent.TrackSubscribed, (track, _pub, participant) => {
+        if (track.kind === 'video') {
+          avatarVideoTrackRef.current = track
+          if (videoRef.current) {
+            track.attach(videoRef.current)
+            setVideoReady(true)
+          }
+        }
+        if (track.kind === 'audio') {
+          avatarAudioTrackRef.current = track
+          // Each track gets its own hidden <audio> appended to body — multiple
+          // audio tracks arrive and would otherwise overwrite one audioRef.
+          const audioEl = track.attach()
+          audioEl.autoplay = true
+          audioEl.dataset.laTrack = participant?.identity || 'unknown'
+          audioEl.style.display = 'none'
+          document.body.appendChild(audioEl)
+          audioEl.play?.().catch(() => {})
+        }
+      })
+
+      room.on(window.LivekitClient.RoomEvent.Disconnected, () => {
+        isSpeakingRef.current = false
+        setAvatarStatus('connected')
+      })
+
+      await room.connect(sess.livekit_url, sess.livekit_client_token)
+
+      try {
+        await room.localParticipant.setMicrophoneEnabled(true)
+      } catch (e) {
+        console.warn('[LA] setMicrophoneEnabled error:', e)
+      }
+
+      // Periodic keep-alive — LiveAvatar sessions auto-close when idle.
+      keepAliveIntervalRef.current = setInterval(() => {
+        keepAliveLiveAvatar(sess.session_id)
+      }, 60_000)
+
+      setAvatarStatus('connected')
+
+      // Greeting (proves the speak pipeline). Delay 800ms so the first
+      // command isn't dropped before tracks finish attaching.
+      isSpeakingRef.current = true
+      setAvatarStatus('speaking')
+      setTimeout(() => {
+        try { sendAvatarCommand(roomRef.current, 'avatar.speak_text', { text: AVATAR_GREETING }) }
+        catch (e) { console.error('greeting speak error:', e) }
+      }, 800)
+    } catch (e) {
+      console.error(e)
+      if (roomRef.current) {
+        try { await roomRef.current.disconnect() } catch { /* ignore */ }
+        roomRef.current = null
+      }
+      sessionRef.current = null
+      avatarVideoTrackRef.current = null
+      avatarAudioTrackRef.current = null
+      setVideoReady(false)
+      setAvatarStatus('idle')
+      alert('Could not start the avatar. Please try again later.')
+    }
+  }, [])
+
+  // Re-attach tracks shortly after connect (timing safety from source).
+  useEffect(() => {
+    if (avatarStatus === 'idle' || avatarStatus === 'connecting') return
+    let rafId = window.requestAnimationFrame(attachAvatarTracks)
+    const t1 = window.setTimeout(attachAvatarTracks, 120)
+    const t2 = window.setTimeout(attachAvatarTracks, 360)
+    return () => {
+      window.cancelAnimationFrame(rafId)
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
+    }
+  }, [avatarStatus, attachAvatarTracks])
+
+  // Clean up the avatar session on unmount or when leaving FTF mode.
+  useEffect(() => {
+    if (mode !== 'ftf' && sessionRef.current) {
+      stopAvatar()
+    }
+  }, [mode, stopAvatar])
+
+  useEffect(() => () => { stopAvatar() }, [stopAvatar])
 
   const quickQuestions = [
     'What can I become after graduating?',
@@ -87,25 +301,49 @@ export default function Assistant() {
               </div>
             </div>
 
-            {/* FTF/STS placeholder */}
+            {/* FTF — real LiveAvatar */}
             {mode === 'ftf' && (
-              <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] text-white">
-                <div className="text-center p-8">
-                  <div className="w-40 h-40 mx-auto rounded-2xl bg-white/10 backdrop-blur-md
-                    border border-white/20 flex items-center justify-center text-6xl mb-6">
-                    👨‍🏫
-                  </div>
-                  <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    Avatar Mode
-                  </h3>
-                  <p className="text-white/70 text-sm mb-6 max-w-md mx-auto">
-                    Coming soon — real-time AI avatar that sees you and responds in real time, just like a face-to-face conversation.
-                  </p>
-                  <button onClick={() => setMode('ttt')}
-                    className="px-6 py-3 rounded-full bg-[#d4a574] text-white font-semibold hover:bg-[#c19463] transition">
-                    Try Text Chat instead
-                  </button>
+              <div className="flex-1 flex flex-col bg-gradient-to-br from-[#0a1e3f] to-[#1a3567]">
+                <div className="flex-1 flex items-center justify-center overflow-y-auto">
+                  <AvatarPanel
+                    status={avatarStatus}
+                    videoRef={videoRef}
+                    audioRef={audioRef}
+                    videoReady={videoReady}
+                    onStart={startAvatar}
+                    onStop={stopAvatar}
+                    onInterrupt={interruptAvatar}
+                  />
                 </div>
+
+                {/* Type to the avatar (avatar speaks the reply) */}
+                {(avatarStatus === 'connected' || avatarStatus === 'speaking') && (
+                  <div className="p-4 border-t border-white/10 bg-[#0a1e3f]">
+                    <div className="flex gap-2">
+                      <input
+                        value={input}
+                        onChange={e => setInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' && input.trim()) {
+                            sendAvatarMessage(input.trim())
+                            setInput('')
+                          }
+                        }}
+                        placeholder="Ask the avatar a question..."
+                        className="flex-1 px-5 py-3 rounded-full border border-white/20 bg-white/10 text-white
+                          placeholder:text-white/50 focus:border-[#d4a574] focus:ring-2 focus:ring-[#d4a574]/30 outline-none"
+                      />
+                      <button
+                        onClick={() => { if (input.trim()) { sendAvatarMessage(input.trim()); setInput('') } }}
+                        disabled={!input.trim()}
+                        className="px-5 py-3 rounded-full bg-[#d4a574] text-white font-semibold
+                          hover:bg-[#c19463] transition disabled:opacity-50 disabled:cursor-not-allowed
+                          flex items-center gap-2">
+                        <Send size={16} />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
