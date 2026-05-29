@@ -86,9 +86,13 @@
 
 .sideBySide .videoWrap,
 .sideBySide .cameraPreview {
-  width: min(300px, calc(50% - 14px));
-  max-width: 300px;
-  max-height: min(54vh, 500px);
+  /* Both videos must fit side by side inside the fixed 600px Avatar Mode card
+     WITH the status row + Start/Stop button (and the typed-input bar) still
+     visible below. aspect-ratio 3/4 → a ~260px tall video is ~195px wide;
+     two of them + gap stay well within the stage width. */
+  width: min(220px, calc(50% - 10px));
+  max-width: 220px;
+  max-height: min(38vh, 260px);
   aspect-ratio: 3/4;
 }
 

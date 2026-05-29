@@ -34,14 +34,53 @@ export default function Assistant() {
   // ─── LiveAvatar (FTF) state ─────────────────────────
   const [avatarStatus, setAvatarStatus] = useState('idle') // idle | connecting | connected | speaking
   const [videoReady, setVideoReady] = useState(false)
+  const [cameraStream, setCameraStream] = useState(null)
   const videoRef = useRef(null)
   const audioRef = useRef(null)
+  const userVideoRef = useRef(null)
+  const cameraStreamRef = useRef(null)
   const roomRef = useRef(null)
   const sessionRef = useRef(null)
   const avatarVideoTrackRef = useRef(null)
   const avatarAudioTrackRef = useRef(null)
   const keepAliveIntervalRef = useRef(null)
   const isSpeakingRef = useRef(false)
+
+  // ─── User webcam: start / stop / sync (ported from cha-interview-bot-liveavatar) ───
+  const startUserCamera = useCallback(async () => {
+    if (cameraStreamRef.current) return true
+    if (!navigator.mediaDevices?.getUserMedia) {
+      // Browser can't do getUserMedia — avatar still works, camera stays a placeholder.
+      console.warn('[camera] getUserMedia unavailable in this browser')
+      return false
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user' },
+        audio: false,
+      })
+      cameraStreamRef.current = stream
+      setCameraStream(stream)
+      return true
+    } catch (e) {
+      // Permission denied or no device — don't crash, just leave the placeholder.
+      console.warn('[camera] could not start user camera:', e)
+      return false
+    }
+  }, [])
+
+  const stopUserCamera = useCallback(() => {
+    if (cameraStreamRef.current) {
+      cameraStreamRef.current.getTracks().forEach(track => track.stop())
+      cameraStreamRef.current = null
+    }
+    setCameraStream(null)
+  }, [])
+
+  // Keep the <video> element's srcObject in sync with the active camera stream.
+  useEffect(() => {
+    if (userVideoRef.current) userVideoRef.current.srcObject = cameraStream || null
+  }, [cameraStream])
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -96,6 +135,7 @@ export default function Assistant() {
   // ─── Avatar: stop / cleanup ─────────────────────────
   const stopAvatar = useCallback(async () => {
     isSpeakingRef.current = false
+    stopUserCamera()
     if (keepAliveIntervalRef.current) {
       clearInterval(keepAliveIntervalRef.current)
       keepAliveIntervalRef.current = null
@@ -112,7 +152,7 @@ export default function Assistant() {
     avatarAudioTrackRef.current = null
     setVideoReady(false)
     setAvatarStatus('idle')
-  }, [])
+  }, [stopUserCamera])
 
   // ─── Avatar: interrupt current speech ───────────────
   const interruptAvatar = useCallback(() => {
@@ -130,6 +170,9 @@ export default function Assistant() {
       return
     }
     setAvatarStatus('connecting')
+    // Kick off the user webcam alongside the session. Failure (no device,
+    // permission denied, unsupported browser) is non-fatal — avatar still works.
+    startUserCamera()
     try {
       // avatar_id omitted → server uses its hardcoded 박교수님 avatar
       const sess = await createLiveAvatarSession({ interactivityType: INTERACTIVITY_TYPE })
@@ -215,6 +258,7 @@ export default function Assistant() {
       }, 800)
     } catch (e) {
       console.error(e)
+      stopUserCamera()
       if (roomRef.current) {
         try { await roomRef.current.disconnect() } catch { /* ignore */ }
         roomRef.current = null
@@ -226,7 +270,7 @@ export default function Assistant() {
       setAvatarStatus('idle')
       alert('Could not start the avatar. Please try again later.')
     }
-  }, [])
+  }, [startUserCamera, stopUserCamera])
 
   // Re-attach tracks shortly after connect (timing safety from source).
   useEffect(() => {
@@ -309,7 +353,9 @@ export default function Assistant() {
                     status={avatarStatus}
                     videoRef={videoRef}
                     audioRef={audioRef}
+                    userVideoRef={userVideoRef}
                     videoReady={videoReady}
+                    cameraActive={Boolean(cameraStream)}
                     onStart={startAvatar}
                     onStop={stopAvatar}
                     onInterrupt={interruptAvatar}
