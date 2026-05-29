@@ -113,6 +113,19 @@ const faculty = [
     email: 'jki0515@cha.ac.kr',
     phone: '+82-31-850-9087',
   },
+  {
+    name: 'Prof. Jong Seok Kim',
+    nameKo: '김종석',
+    role: 'Professor',
+    track: 'Business Management',
+    img: '/faculty/kim-jong-seok.png',
+    edu: 'Ph.D., Technology Management',
+    research: 'Technology Management · Innovation Management · Foresight · Strategy',
+    career: '',
+    teaches: 'Technology Management · Strategic Management',
+    email: 'gabriel.jongseok.kim@cha.ac.kr',
+    phone: '+82-31-850-9034',
+  },
 ]
 
 export default function Faculty() {
