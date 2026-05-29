@@ -54,7 +54,7 @@ export async function keepAliveLiveAvatar(sessionId) {
 }
 
 // Request a LiveAvatar session (token + start) from our serverless function.
-// avatar_id is intentionally omitted so the server uses LIVEAVATAR_AVATAR_ID.
+// avatar_id is intentionally omitted so the server uses its hardcoded 박교수님 avatar.
 export async function createLiveAvatarSession({ avatarId, interactivityType = 'CONVERSATIONAL' } = {}) {
   const body = { interactivity_type: interactivityType }
   if (avatarId) body.avatar_id = avatarId

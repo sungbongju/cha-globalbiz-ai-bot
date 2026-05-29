@@ -1,8 +1,8 @@
 // api/liveavatar-token.js
 // LiveAvatar 세션 토큰 생성 + 세션 시작 (2단계 통합)
-// Ported from cha-interview-bot-liveavatar. Functionally identical, except:
-// the avatar UUID is read from process.env.LIVEAVATAR_AVATAR_ID when the
-// client does not supply one — keeps the persona UUID server-side too.
+// Ported from cha-interview-bot-liveavatar.
+// AVATAR_ID는 비밀이 아니라 단순 식별자라 하드코딩 (env 불필요). API 키만 server-side.
+const PROF_PARK_AVATAR_ID = "3554efce-af84-4701-981e-2cbd46e991af"; // 박교수님 LiveAvatar
 
 function corsHeaders(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {};
-    const avatarId = body.avatar_id || process.env.LIVEAVATAR_AVATAR_ID;
+    const avatarId = body.avatar_id || PROF_PARK_AVATAR_ID;
     const contextId = body.context_id || null;
     const interactivityType = body.interactivity_type || "CONVERSATIONAL";
 

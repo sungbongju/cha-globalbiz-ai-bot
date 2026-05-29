@@ -131,7 +131,7 @@ export default function Assistant() {
     }
     setAvatarStatus('connecting')
     try {
-      // avatar_id omitted → server uses LIVEAVATAR_AVATAR_ID
+      // avatar_id omitted → server uses its hardcoded 박교수님 avatar
       const sess = await createLiveAvatarSession({ interactivityType: INTERACTIVITY_TYPE })
       sessionRef.current = sess
 
