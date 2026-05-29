@@ -10,14 +10,10 @@ import {
 } from '../lib/liveavatar'
 import { MicRecorder, isMicRecorderSupported } from '../lib/stt'
 import { speak as ttsSpeak, stopSpeaking as ttsStop } from '../lib/tts'
+import { streamChat } from '../lib/chat'
 
-const SAMPLE_REPLIES = [
-  "Great question! The Global Business AI major rests on three pillars: AI Fluency, Global Business, and Bio-Healthcare Anchor. AI is treated as the strategic lens of modern enterprise — not a supporting tool — and bio-healthcare grounds your expertise in CHA's hospital and biotech ecosystem.",
-  "Our curriculum is taught entirely in English. Learning here means immersion in Korea's most advanced export industries — semiconductors, batteries, biopharmaceuticals, K-content, and more — with bio-healthcare as the anchoring domain.",
-  "Through CHA's deep specialization in bio-healthcare, students directly engage with university hospitals, fertility centers, biotech ventures, and clinical research institutes operating on the global frontier of life sciences.",
-  "Career pathways extend across global pharmaceutical and biotech corporations, digital health ventures, semiconductor and battery enterprises, healthcare consulting firms, life-science investment, and public policy agencies. International students gain a strategic gateway to Korean and broader Asian markets.",
-  "Specific admission cycle dates, quotas, and tuition details are confirmed each cycle. Please contact our admissions team or reach out through the contact form on the Admission page — we respond within 48 hours.",
-]
+const FALLBACK_REPLY =
+  "Sorry — I couldn't reach the assistant just now. Please try again in a moment."
 
 const AVATAR_GREETING =
   "Hi! I'm the GBA Assistant. Ask me anything about the Global Business AI major — courses, faculty, careers, or life in Korea."
@@ -101,22 +97,52 @@ export default function Assistant() {
     if (c) c.scrollTop = c.scrollHeight
   }, [messages])
 
-  const send = () => {
-    if (!input.trim()) return
+  const send = useCallback(async () => {
     const userMsg = input.trim()
+    if (!userMsg || typing) return
     setMessages(m => [...m, { role: 'user', text: userMsg }])
     setInput('')
     setTyping(true)
-    setTimeout(() => {
-      const reply = SAMPLE_REPLIES[Math.floor(Math.random() * SAMPLE_REPLIES.length)]
-      setMessages(m => [...m, { role: 'bot', text: reply }])
+
+    // Reserve a bot bubble we update live as tokens stream in.
+    let botIndex = -1
+    setMessages(m => {
+      botIndex = m.length
+      return [...m, { role: 'bot', text: '' }]
+    })
+
+    try {
+      const reply = await streamChat(userMsg, {
+        onToken: (_token, soFar) => {
+          // Stop the typing indicator once real text starts arriving.
+          setTyping(false)
+          setMessages(m => {
+            const next = [...m]
+            if (next[botIndex]) next[botIndex] = { role: 'bot', text: soFar }
+            return next
+          })
+        },
+      })
+      setMessages(m => {
+        const next = [...m]
+        if (next[botIndex]) next[botIndex] = { role: 'bot', text: reply }
+        return next
+      })
+    } catch (e) {
+      console.warn('[chat] stream failed:', e)
+      setMessages(m => {
+        const next = [...m]
+        if (next[botIndex]) next[botIndex] = { role: 'bot', text: FALLBACK_REPLY }
+        return next
+      })
+    } finally {
       setTyping(false)
-    }, 1000 + Math.random() * 800)
-  }
+    }
+  }, [input, typing])
 
   // ─── Voice Mode (STS): handle a finished transcript ──────────────────
-  // user speech → text (already done by MicRecorder) → reply → OmniVoice → play.
-  // Reply text reuses SAMPLE_REPLIES for this pass (RAG/LLM hookup is later work).
+  // user speech → text (already done by MicRecorder) → /api/chat-stream (RAG +
+  // Gemma4) → fullText → OmniVoice → play.
   const handleVoiceTranscript = useCallback(async (rawText) => {
     const text = (rawText || '').trim()
     if (!text || text.length < 2) return
@@ -131,7 +157,13 @@ export default function Assistant() {
     // Pause the mic so OmniVoice playback doesn't get re-transcribed.
     micRecorderRef.current?.pause()
 
-    const reply = SAMPLE_REPLIES[Math.floor(Math.random() * SAMPLE_REPLIES.length)]
+    let reply
+    try {
+      reply = await streamChat(text)   // POST /api/chat-stream → RAG reply
+    } catch (e) {
+      console.warn('[voice] chat failed:', e)
+      reply = FALLBACK_REPLY
+    }
     setVoiceReply(reply)
     setVoiceState('speaking')
 
@@ -223,11 +255,20 @@ export default function Assistant() {
   }, [])
 
   // ─── Avatar: send a typed question while in avatar mode ───
-  // No globalbiz LLM backend yet — reuse SAMPLE_REPLIES so the avatar talks.
-  const sendAvatarMessage = useCallback((userText) => {
+  // user text → /api/chat-stream (RAG + Gemma4) → fullText → avatar speaks it.
+  const sendAvatarMessage = useCallback(async (userText) => {
     const text = (userText || '').trim()
     if (!text) return
-    const reply = SAMPLE_REPLIES[Math.floor(Math.random() * SAMPLE_REPLIES.length)]
+    // Show a "thinking" state while the reply streams in.
+    isSpeakingRef.current = true
+    setAvatarStatus('speaking')
+    let reply
+    try {
+      reply = await streamChat(text)
+    } catch (e) {
+      console.warn('[avatar] chat failed:', e)
+      reply = FALLBACK_REPLY
+    }
     speakAvatar(reply)
   }, [speakAvatar])
 
@@ -688,7 +729,7 @@ export default function Assistant() {
 
           <div className="mt-6 text-center text-xs text-gray-400 flex items-center justify-center gap-2">
             <Sparkles size={12} className="text-[#d4a574]" />
-            Prototype responses · Real LLM integration coming soon
+            Answers powered by on-prem RAG + Gemma4
           </div>
         </div>
       </section>
