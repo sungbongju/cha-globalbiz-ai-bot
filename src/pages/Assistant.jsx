@@ -95,7 +95,10 @@ export default function Assistant() {
   }, [cameraStream])
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' })
+    // 채팅 스크롤 컨테이너 내부만 맨 아래로 — scrollIntoView는 페이지 전체를
+    // 아래로 점프시키므로 컨테이너의 scrollTop만 직접 조정한다.
+    const c = endRef.current?.parentElement
+    if (c) c.scrollTop = c.scrollHeight
   }, [messages])
 
   const send = () => {
