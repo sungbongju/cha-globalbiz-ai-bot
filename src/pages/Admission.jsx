@@ -9,6 +9,12 @@ export default function Admission() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    // 백엔드 메일 서버가 없으므로 사용자의 메일 클라이언트로 dkpark@cha.ac.kr 발송.
+    const subject = encodeURIComponent(`[GBA Inquiry] ${form.name || 'Prospective student'}`)
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\nCountry: ${form.country}\n\n${form.message}`
+    )
+    window.location.href = `mailto:dkpark@cha.ac.kr?subject=${subject}&body=${body}`
     setSubmitted(true)
     setTimeout(() => setSubmitted(false), 5000)
   }
@@ -145,7 +151,10 @@ export default function Admission() {
           )}
 
           <div className="mt-10 pt-10 border-t border-gray-100 text-center text-sm text-gray-500">
-            Or contact us directly: <a href="mailto:gba@cha.ac.kr" className="text-[#d4a574] font-semibold hover:underline">gba@cha.ac.kr</a>
+            Or contact us directly:{' '}
+            <a href="mailto:dkpark@cha.ac.kr" className="text-[#d4a574] font-semibold hover:underline">dkpark@cha.ac.kr</a>
+            <span className="mx-2 text-gray-300">·</span>
+            <a href="tel:+82318508984" className="text-[#d4a574] font-semibold hover:underline">+82-31-850-8984</a>
           </div>
         </div>
       </section>

@@ -41,7 +41,7 @@ export default function Footer() {
               <li className="flex items-center gap-2"><Phone size={14} className="text-[#d4a574]" />
                 +82-31-850-8984</li>
               <li className="flex items-center gap-2"><Mail size={14} className="text-[#d4a574]" />
-                gba@cha.ac.kr</li>
+                <a href="mailto:dkpark@cha.ac.kr" className="hover:text-white transition">dkpark@cha.ac.kr</a></li>
             </ul>
           </div>
         </div>
