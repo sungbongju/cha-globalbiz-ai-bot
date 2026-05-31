@@ -52,7 +52,7 @@ export default function Career() {
           industries are no longer asking whether to hire hybrid talent — but where to find enough of it."
       />
 
-      <section className="py-24 bg-white">
+      <section id="tracks" className="py-24 bg-white scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="text-sm uppercase tracking-widest text-[#d4a574] font-semibold mb-4">
@@ -105,7 +105,7 @@ export default function Career() {
         </div>
       </section>
 
-      <section className="py-24 bg-[#faf8f3]">
+      <section id="pathways" className="py-24 bg-[#faf8f3] scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center max-w-3xl mx-auto mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#0a1e3f] mb-3"
@@ -138,7 +138,7 @@ export default function Career() {
         </div>
       </section>
 
-      <section className="py-20 bg-[#0a1e3f] text-white">
+      <section id="global-advantage" className="py-20 bg-[#0a1e3f] text-white scroll-mt-24">
         <div className="max-w-5xl mx-auto px-6 lg:px-10 text-center">
           <Award className="mx-auto text-[#d4a574] mb-6" size={48} />
           <h2 className="text-3xl md:text-4xl font-bold mb-4"

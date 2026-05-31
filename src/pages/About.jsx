@@ -40,7 +40,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-24 bg-white">
+      <section id="overview" className="py-24 bg-white scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid lg:grid-cols-12 gap-12 items-center mb-20">
             <div className="lg:col-span-7">
@@ -69,7 +69,7 @@ export default function About() {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-12 gap-12 items-center">
+          <div id="why-cha" className="grid lg:grid-cols-12 gap-12 items-center scroll-mt-24">
             <div className="lg:col-span-5 order-2 lg:order-1">
               <img
                 src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80&auto=format&fit=crop"
@@ -99,7 +99,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-20 bg-[#faf8f3]">
+      <section id="differentiators" className="py-20 bg-[#faf8f3] scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <h2 className="text-3xl font-bold text-[#0a1e3f] mb-12 text-center"
             style={{ fontFamily: "'Playfair Display', serif" }}>

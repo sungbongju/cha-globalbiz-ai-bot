@@ -227,7 +227,7 @@ export default function Curriculum() {
           Business Management and AI Medical Data Science tracks in parallel."
       />
 
-      <section className="relative py-24 text-white overflow-hidden
+      <section id="journey" className="relative py-24 text-white overflow-hidden scroll-mt-24
         bg-gradient-to-br from-[#060f23] via-[#0a1e3f] to-[#0f1024]">
         {/* 글로우 배경 효과 */}
         <div className="absolute inset-0 opacity-40 pointer-events-none"
@@ -340,7 +340,7 @@ export default function Curriculum() {
       </section>
 
       {/* 모듈 설명 */}
-      <section className="py-20 bg-white">
+      <section id="modules" className="py-20 bg-white scroll-mt-24">
         <div className="max-w-5xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-12">
             <div className="text-sm uppercase tracking-widest text-[#d4a574] font-semibold mb-3">
