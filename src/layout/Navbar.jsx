@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react'
 import AuthModal from '../components/AuthModal'
-import { getUser, clearAuth } from '../lib/auth'
+import { getUser, clearAuth, logVisit } from '../lib/auth'
 
 // 상단 메뉴 구조 — children 이 있으면 호버 드롭다운, 없으면 단일 링크.
 // 서브항목 hash 는 각 페이지 <section id="..."> 와 일치해야 함.
@@ -172,7 +172,8 @@ export default function Navbar() {
             )}
           </li>
           <li>
-            <Link to="/admission" className="ml-2 px-5 py-2.5 rounded-full bg-[#d4a574] text-white
+            <Link to="/admission" onClick={() => logVisit('action', 'apply_click')}
+              className="ml-2 px-5 py-2.5 rounded-full bg-[#d4a574] text-white
               text-sm font-semibold shadow-lg shadow-[#d4a574]/30 hover:bg-[#c19463] transition">
               Apply Now
             </Link>
@@ -242,6 +243,7 @@ export default function Navbar() {
             </button>
           )}
           <Link to="/admission"
+            onClick={() => { setOpen(false); logVisit('action', 'apply_click') }}
             className="mt-3 block text-center px-5 py-3 rounded-full bg-[#d4a574] text-white font-semibold">
             Apply Now
           </Link>

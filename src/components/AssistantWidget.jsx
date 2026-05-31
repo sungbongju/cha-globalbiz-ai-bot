@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MessageCircle, X, Sparkles, ArrowRight } from 'lucide-react'
+import { logVisit } from '../lib/auth'
 
 // 모든 페이지 우하단에 떠다니는 챗봇 위젯 (placeholder)
 export default function AssistantWidget() {
@@ -10,7 +11,10 @@ export default function AssistantWidget() {
     <>
       {/* 떠다니는 버튼 */}
       <button
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (!open) logVisit('action', 'assistant_open')
+          setOpen(!open)
+        }}
         className="fixed bottom-6 right-6 z-40 group"
         aria-label="Open AI Assistant"
       >

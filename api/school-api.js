@@ -7,7 +7,8 @@ const ALLOWED_ACTIONS = new Set([
   'verify',
   'save_chat',
   'save_survey',
-  'usage_summary'
+  'usage_summary',
+  'visit_count'
 ])
 
 const FORWARD_HEADERS = ['x-dashboard-token', 'authorization']

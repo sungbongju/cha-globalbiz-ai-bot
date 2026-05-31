@@ -26,6 +26,11 @@ export function newSessionId() {
 }
 export function getSessionId() { return localStorage.getItem(SID_KEY) }
 
+// 익명 방문도 셀 수 있도록 첫 로드부터 세션 ID 보장 (없으면 발급)
+export function ensureSessionId() {
+  return getSessionId() || newSessionId()
+}
+
 async function call(action, payload = {}) {
   const res = await fetch(`${API_BASE}?action=${action}`, {
     method: 'POST',
@@ -69,6 +74,33 @@ export function saveChat(session_id, role, message, rag_hits = null) {
     body: JSON.stringify(body),
     keepalive: true
   }).catch(() => {})
+}
+
+// ─── Visitor analytics ──────────────────────────────────────────────
+// visit_logs_gba.role 은 ENUM('user','assistant')이라 'pageview'/'action' 을
+// 직접 못 넣는다 → role='user' + message 에 '[pageview] /path' / '[action] name'
+// 형태로 구분 가능하게 기록. saveChat 과 동일한 fire-and-forget 경로.
+// 식별: 로그인 시 token→user_id, 아니면 익명 gba_sid. path/action 외 PII 없음.
+export function logVisit(kind, value) {
+  const session_id = ensureSessionId()
+  const prefix = kind === 'action' ? '[action]' : '[pageview]'
+  const message = `${prefix} ${value || ''}`.trim()
+  saveChat(session_id, 'user', message)
+}
+
+// 재방문 횟수 조회 (읽기 전용). 토큰 있으면 user 기준, 없으면 session 기준.
+// 응답: { success, count, days, sessions, by }. 실패해도 throw 안 함 → null 반환.
+export async function getVisitCount() {
+  try {
+    const session_id = ensureSessionId()
+    const token = getToken()
+    const body = { session_id }
+    if (token) body.token = token
+    const r = await call('visit_count', body)
+    return r && r.success ? r : null
+  } catch {
+    return null
+  }
 }
 
 // 설문 제출 (v1) — answers 객체 그대로 전달
