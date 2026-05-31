@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronDown } from 'lucide-react'
+import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react'
+import AuthModal from '../components/AuthModal'
+import { getUser, clearAuth } from '../lib/auth'
 
 // 상단 메뉴 구조 — children 이 있으면 호버 드롭다운, 없으면 단일 링크.
 // 서브항목 hash 는 각 페이지 <section id="..."> 와 일치해야 함.
@@ -38,6 +40,8 @@ export default function Navbar() {
   const [openAccordion, setOpenAccordion] = useState(null) // 모바일 아코디언
   const [hovered, setHovered] = useState(null)     // 데스크탑 드롭다운
   const [scrolled, setScrolled] = useState(false)
+  const [authOpen, setAuthOpen] = useState(false)  // 로그인 모달
+  const [user, setUser] = useState(getUser())      // 로그인 사용자
   const location = useLocation()
   const isHome = location.pathname === '/'
 
@@ -46,6 +50,27 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // 다른 곳(Layout의 verifyToken 등)에서 로그인 상태가 바뀌면 동기화
+  useEffect(() => {
+    const sync = () => setUser(getUser())
+    window.addEventListener('gba-auth-changed', sync)
+    window.addEventListener('storage', sync)
+    return () => {
+      window.removeEventListener('gba-auth-changed', sync)
+      window.removeEventListener('storage', sync)
+    }
+  }, [])
+
+  const handleAuthSuccess = (u) => {
+    setUser(u)
+    window.dispatchEvent(new Event('gba-auth-changed'))
+  }
+  const handleLogout = () => {
+    clearAuth()
+    setUser(null)
+    window.dispatchEvent(new Event('gba-auth-changed'))
+  }
 
   useEffect(() => { setOpen(false); setOpenAccordion(null) }, [location.pathname])
 
@@ -120,6 +145,33 @@ export default function Navbar() {
             )
           })}
           <li>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className={`flex items-center gap-1.5 text-sm font-medium
+                  ${transparent ? 'text-white/90' : 'text-[#0a1e3f]'}`}>
+                  <User size={16} className="text-[#d4a574]" />
+                  {user.name}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  aria-label="Logout"
+                  title="로그아웃"
+                  className={`p-1.5 rounded-full transition hover:text-[#d4a574]
+                    ${transparent ? 'text-white/70' : 'text-gray-500'}`}>
+                  <LogOut size={16} />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAuthOpen(true)}
+                className={`flex items-center gap-1.5 text-sm font-medium hover:text-[#d4a574] transition
+                  ${transparent ? 'text-white/90' : 'text-gray-700'}`}>
+                <User size={16} />
+                Sign in / Sign up
+              </button>
+            )}
+          </li>
+          <li>
             <Link to="/admission" className="ml-2 px-5 py-2.5 rounded-full bg-[#d4a574] text-white
               text-sm font-semibold shadow-lg shadow-[#d4a574]/30 hover:bg-[#c19463] transition">
               Apply Now
@@ -169,12 +221,34 @@ export default function Navbar() {
               </div>
             )
           })}
+          {user ? (
+            <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
+              <span className="flex items-center gap-1.5 text-sm font-medium text-[#0a1e3f]">
+                <User size={16} className="text-[#d4a574]" />
+                {user.name}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#d4a574]">
+                <LogOut size={15} /> 로그아웃
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => { setOpen(false); setAuthOpen(true) }}
+              className="mt-4 w-full flex items-center justify-center gap-1.5 px-5 py-3 rounded-full
+                border border-[#0a1e3f] text-[#0a1e3f] font-semibold">
+              <User size={16} /> Sign in / Sign up
+            </button>
+          )}
           <Link to="/admission"
-            className="mt-4 block text-center px-5 py-3 rounded-full bg-[#d4a574] text-white font-semibold">
+            className="mt-3 block text-center px-5 py-3 rounded-full bg-[#d4a574] text-white font-semibold">
             Apply Now
           </Link>
         </div>
       )}
+
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onSuccess={handleAuthSuccess} />
     </header>
   )
 }
