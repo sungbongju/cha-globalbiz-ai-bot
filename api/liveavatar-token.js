@@ -2,7 +2,7 @@
 // LiveAvatar 세션 토큰 생성 + 세션 시작 (2단계 통합)
 // Ported from cha-interview-bot-liveavatar.
 // AVATAR_ID는 비밀이 아니라 단순 식별자라 하드코딩 (env 불필요). API 키만 server-side.
-const PROF_PARK_AVATAR_ID = "3554efce-af84-4701-981e-2cbd46e991af"; // 박교수님 LiveAvatar
+const PROF_PARK_AVATAR_ID = "dcaf1c6a93b94574a63bef8504bc49eb"; // 박교수님 LiveAvatar (2026-06 새 아바타)
 
 function corsHeaders(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

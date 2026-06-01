@@ -24,7 +24,7 @@ const faculty = [
   {
     name: 'Prof. Tae Dong Kim',
     nameKo: '김태동',
-    role: 'Dean of Graduate School',
+    role: 'Professor',
     track: 'Business Management',
     img: '/faculty/kim-tae-dong.jpg',
     edu: 'Ph.D., Accounting & Taxation',

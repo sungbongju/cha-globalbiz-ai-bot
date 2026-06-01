@@ -5,18 +5,47 @@ import PageHero from '../components/PageHero'
 
 export default function Admission() {
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
   const [form, setForm] = useState({ name: '', email: '', country: '', message: '' })
 
-  const handleSubmit = (e) => {
+  // 실제 메일 발송 — Web3Forms (api.web3forms.com) 로 dkpark@cha.ac.kr 에 전달.
+  // access key 는 클라이언트 노출이 안전한 공개 키 → Vercel env VITE_WEB3FORMS_KEY 로 주입.
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // 백엔드 메일 서버가 없으므로 사용자의 메일 클라이언트로 dkpark@cha.ac.kr 발송.
-    const subject = encodeURIComponent(`[GBA Inquiry] ${form.name || 'Prospective student'}`)
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nCountry: ${form.country}\n\n${form.message}`
-    )
-    window.location.href = `mailto:dkpark@cha.ac.kr?subject=${subject}&body=${body}`
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 5000)
+    setError('')
+    const accessKey = import.meta.env.VITE_WEB3FORMS_KEY
+    if (!accessKey) {
+      setError('The contact form is not configured yet. Please email us directly below.')
+      return
+    }
+    setSending(true)
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: accessKey,
+          subject: `[GBA Inquiry] ${form.name || 'Prospective student'}`,
+          from_name: 'GBA Website',
+          name: form.name,
+          email: form.email,
+          country: form.country,
+          message: form.message,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setSubmitted(true)
+        setForm({ name: '', email: '', country: '', message: '' })
+      } else {
+        setError(data.message || 'Sorry, your message could not be sent. Please email us directly below.')
+      }
+    } catch {
+      setError('A network error occurred. Please try again, or email us directly below.')
+    } finally {
+      setSending(false)
+    }
   }
 
   const steps = [
@@ -142,10 +171,16 @@ export default function Admission() {
                 value={form.message} onChange={e => setForm({...form, message: e.target.value})}
                 className="w-full p-4 rounded-xl border border-gray-200 focus:border-[#d4a574]
                   focus:ring-2 focus:ring-[#d4a574]/20 outline-none transition resize-none" />
-              <button type="submit"
+              {error && (
+                <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+                  {error}
+                </p>
+              )}
+              <button type="submit" disabled={sending}
                 className="w-full p-4 rounded-xl bg-[#d4a574] text-white font-semibold
-                  hover:bg-[#c19463] transition inline-flex items-center justify-center gap-2">
-                <Mail size={18} /> Send Message
+                  hover:bg-[#c19463] transition inline-flex items-center justify-center gap-2
+                  disabled:opacity-60 disabled:cursor-not-allowed">
+                <Mail size={18} /> {sending ? 'Sending…' : 'Send Message'}
               </button>
             </form>
           )}
