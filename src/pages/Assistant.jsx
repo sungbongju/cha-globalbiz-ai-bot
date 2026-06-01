@@ -20,6 +20,17 @@ const AVATAR_GREETING =
 
 const INTERACTIVITY_TYPE = 'CONVERSATIONAL'
 
+// Remember which modes a visitor has tried so the trust survey can gate
+// voice/video-only questions. Stored client-side only (no PII).
+function recordModeUsed(mode) {
+  try {
+    const raw = localStorage.getItem('gba_modes_used')
+    const set = new Set(raw ? JSON.parse(raw) : [])
+    set.add(mode)
+    localStorage.setItem('gba_modes_used', JSON.stringify([...set]))
+  } catch { /* localStorage unavailable — non-critical */ }
+}
+
 export default function Assistant() {
   const [mode, setMode] = useState('ttt')   // 'ftf' | 'sts' | 'ttt'
   const [messages, setMessages] = useState([
@@ -474,7 +485,7 @@ export default function Assistant() {
               { id: 'sts', icon: Mic,           label: 'Voice Mode' },
               { id: 'ttt', icon: MessageSquare, label: 'Text Chat' },
             ].map(m => (
-              <button key={m.id} onClick={() => setMode(m.id)}
+              <button key={m.id} onClick={() => { setMode(m.id); recordModeUsed(m.id) }}
                 className={`inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold
                   transition border ${mode === m.id
                     ? 'bg-[#0a1e3f] text-white border-[#0a1e3f] shadow-lg'

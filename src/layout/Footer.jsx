@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Mail, Phone } from 'lucide-react'
+import { MapPin, Mail, Phone, MessageSquareHeart } from 'lucide-react'
+import { logVisit } from '../lib/auth'
 
 export default function Footer() {
+  const openSurvey = () => {
+    logVisit('action', 'survey_open')
+    window.dispatchEvent(new Event('gba-open-survey'))
+  }
   return (
     <footer className="bg-[#08172e] text-white/70 py-16">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
@@ -44,6 +49,25 @@ export default function Footer() {
                 <a href="mailto:dkpark@cha.ac.kr" className="hover:text-white transition">dkpark@cha.ac.kr</a></li>
             </ul>
           </div>
+        </div>
+
+        {/* Survey invite — navy/gold, opens the trust-signals research survey */}
+        <div className="mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4
+          rounded-2xl border border-[#d4a574]/30 bg-white/5 px-6 py-5">
+          <div className="flex items-center gap-3">
+            <MessageSquareHeart size={22} className="text-[#d4a574] shrink-0" />
+            <div>
+              <div className="text-white font-semibold text-sm">Help us improve</div>
+              <div className="text-xs text-white/60">Share your experience with the AI assistant — about 2 minutes, fully anonymous.</div>
+            </div>
+          </div>
+          <button
+            onClick={openSurvey}
+            className="shrink-0 rounded-xl bg-[#d4a574] px-5 py-2.5 text-sm font-semibold text-white
+              shadow-lg shadow-[#d4a574]/20 hover:bg-[#c19463] transition"
+          >
+            Take the 2-min survey
+          </button>
         </div>
 
         <div className="pt-8 border-t border-white/10 flex flex-wrap justify-between items-center gap-4 text-xs text-white/50">

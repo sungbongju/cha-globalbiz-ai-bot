@@ -103,10 +103,11 @@ export async function getVisitCount() {
   }
 }
 
-// 설문 제출 (v1) — answers 객체 그대로 전달
+// 설문 제출 — answers 객체 그대로 전달. answers.survey_version 가 있으면 그대로
+// 사용하고, 없으면 기본값 'gba_v1'. *_gba 테이블은 임의의 answer key 를 JSON 형태로 수용.
 export async function saveSurvey(answers) {
   const token = getToken()
-  const body = { ...answers, survey_version: 'v1' }
+  const body = { survey_version: 'gba_v1', ...answers }
   if (token) body.token = token
   const r = await call('save_survey', body)
   return r

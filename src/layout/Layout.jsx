@@ -1,13 +1,27 @@
 import { Outlet, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import AssistantWidget from '../components/AssistantWidget'
 import ReturnGreeting from '../components/ReturnGreeting'
-import { verifyToken, ensureSessionId, logVisit } from '../lib/auth'
+import SurveyModal from '../components/SurveyModal'
+import { verifyToken, ensureSessionId, logVisit, getVisitCount } from '../lib/auth'
 
 export default function Layout() {
   const { pathname, hash } = useLocation()
+  const [surveyOpen, setSurveyOpen] = useState(false)
+  const [visitCount, setVisitCount] = useState(1)
+
+  // Footer "Take the survey" button dispatches this event. Fetch visit count on
+  // open so the modal can unlock revisit-only questions (count >= 2).
+  useEffect(() => {
+    const onOpen = () => {
+      getVisitCount().then(r => { if (r && r.count) setVisitCount(r.count) }).catch(() => {})
+      setSurveyOpen(true)
+    }
+    window.addEventListener('gba-open-survey', onOpen)
+    return () => window.removeEventListener('gba-open-survey', onOpen)
+  }, [])
 
   // 앱 로드 시: 익명 방문도 셀 수 있게 세션 ID 먼저 보장 → 토큰 검증.
   useEffect(() => {
@@ -47,6 +61,11 @@ export default function Layout() {
       <Footer />
       <AssistantWidget />
       <ReturnGreeting />
+      <SurveyModal
+        open={surveyOpen}
+        onClose={() => setSurveyOpen(false)}
+        visitCount={visitCount}
+      />
     </div>
   )
 }
