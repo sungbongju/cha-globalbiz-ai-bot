@@ -623,7 +623,7 @@ export default function Assistant() {
               <div className="flex-1 flex flex-col bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] min-h-0">
                 <div className="flex-1 flex flex-col lg:flex-row min-h-0">
                   {/* Avatar (hero) */}
-                  <div className="lg:w-[44%] flex items-center justify-center overflow-y-auto p-2">
+                  <div className="lg:w-[44%] flex items-center justify-center overflow-y-auto scroll-navy p-2">
                     <AvatarPanel
                       status={avatarStatus}
                       videoRef={videoRef}
@@ -647,7 +647,7 @@ export default function Assistant() {
                           <span className="text-white/60">{avatarStatus === 'speaking' ? 'Speaking…' : 'Listening…'}</span>
                         </span>
                       </div>
-                      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+                      <div className="flex-1 overflow-y-auto scroll-navy px-4 py-4 space-y-3">
                         {messages.map((m, i) => (
                           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-[82%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${

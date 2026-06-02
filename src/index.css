@@ -24,3 +24,26 @@ html, body {
 * {
   box-sizing: border-box;
 }
+
+/* 네이비 패널용 테마 스크롤바 (흰색 기본 대신 골드 톤) */
+.scroll-navy {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 165, 116, 0.45) transparent;
+}
+.scroll-navy::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-navy::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-navy::-webkit-scrollbar-thumb {
+  background: rgba(212, 165, 116, 0.4);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.scroll-navy::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 165, 116, 0.7);
+  background-clip: padding-box;
+}
