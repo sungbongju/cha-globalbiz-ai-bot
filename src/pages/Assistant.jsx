@@ -54,6 +54,10 @@ export default function Assistant() {
   const avatarAudioTrackRef = useRef(null)
   const keepAliveIntervalRef = useRef(null)
   const isSpeakingRef = useRef(false)
+  // Avatar Mode voice input — Whisper STT (mic → /api/stt → Gemma4 → avatar speaks)
+  const avatarMicRef = useRef(null)
+  const avatarVoiceBusyRef = useRef(false)   // thinking/speaking guard (echo)
+  const avatarSpeakSafetyRef = useRef(null)  // fallback resume if speak_ended is missed
 
   // ─── Voice Mode (STS) state — Middleton Whisper STT + OmniVoice TTS ───
   // No avatar / no LiveAvatar credits: mic → /api/stt → reply → /api/tts → play.
@@ -283,6 +287,71 @@ export default function Assistant() {
     speakAvatar(reply)
   }, [speakAvatar])
 
+  // ─── Avatar Mode voice input: resume mic after the avatar finishes ───
+  const resumeAvatarMic = useCallback(() => {
+    if (avatarSpeakSafetyRef.current) {
+      clearTimeout(avatarSpeakSafetyRef.current)
+      avatarSpeakSafetyRef.current = null
+    }
+    avatarVoiceBusyRef.current = false
+    const rec = avatarMicRef.current
+    if (rec && rec.isRunning) rec.resume()
+  }, [])
+
+  // user speech → /api/stt (Whisper) → /api/chat-stream (RAG+Gemma4) → avatar speaks.
+  const handleAvatarVoiceTranscript = useCallback(async (rawText) => {
+    const text = (rawText || '').trim()
+    if (!text || text.length < 2) return
+    if (avatarVoiceBusyRef.current) return     // a turn is already in progress
+    if (isSpeakingRef.current) return          // avatar is speaking → ignore (echo)
+    if (!roomRef.current || !sessionRef.current) return
+
+    avatarVoiceBusyRef.current = true
+    avatarMicRef.current?.pause()              // stop listening while we think + avatar speaks
+    setMessages(m => [...m, { role: 'user', text }])
+
+    let reply
+    try {
+      reply = await streamChat(text)
+    } catch (e) {
+      console.warn('[avatar-voice] chat failed:', e)
+      reply = FALLBACK_REPLY
+    }
+    setMessages(m => [...m, { role: 'bot', text: reply }])
+    speakAvatar(reply)                         // avatar speaks → speak_ended resumes the mic
+
+    // Safety: if speak_ended never arrives, force-resume so the mic isn't stuck.
+    if (avatarSpeakSafetyRef.current) clearTimeout(avatarSpeakSafetyRef.current)
+    avatarSpeakSafetyRef.current = setTimeout(() => {
+      isSpeakingRef.current = false
+      setAvatarStatus(s => (s === 'speaking' ? 'connected' : s))
+      resumeAvatarMic()
+    }, 30000)
+  }, [speakAvatar, resumeAvatarMic])
+
+  // ─── Avatar Mode voice input: start the mic recorder ───
+  const startAvatarMic = useCallback(async () => {
+    if (avatarMicRef.current) return
+    if (!isMicRecorderSupported()) {
+      console.warn('[avatar-voice] mic not supported — Avatar Mode stays text-only')
+      return
+    }
+    const rec = new MicRecorder({
+      sttEndpoint: '/api/stt',
+      onTranscript: (t) => handleAvatarVoiceTranscript(t),
+      onError: (err) => console.warn('[avatar-voice] MicRecorder error:', err),
+    })
+    avatarMicRef.current = rec
+    try {
+      await rec.start()
+      // The greeting is about to play — keep the mic paused until it ends.
+      if (isSpeakingRef.current) rec.pause()
+    } catch (e) {
+      console.warn('[avatar-voice] mic start failed:', e)
+      avatarMicRef.current = null
+    }
+  }, [handleAvatarVoiceTranscript])
+
   // ─── Avatar: attach subscribed tracks to media elements ───
   const attachAvatarTracks = useCallback(() => {
     if (avatarVideoTrackRef.current && videoRef.current) {
@@ -302,6 +371,16 @@ export default function Assistant() {
   // ─── Avatar: stop / cleanup ─────────────────────────
   const stopAvatar = useCallback(async () => {
     isSpeakingRef.current = false
+    // Stop voice input
+    if (avatarSpeakSafetyRef.current) {
+      clearTimeout(avatarSpeakSafetyRef.current)
+      avatarSpeakSafetyRef.current = null
+    }
+    avatarVoiceBusyRef.current = false
+    if (avatarMicRef.current) {
+      try { avatarMicRef.current.stop() } catch { /* ignore */ }
+      avatarMicRef.current = null
+    }
     stopUserCamera()
     if (keepAliveIntervalRef.current) {
       clearInterval(keepAliveIntervalRef.current)
@@ -364,10 +443,12 @@ export default function Assistant() {
           if (type === 'avatar.speak_started') {
             isSpeakingRef.current = true
             setAvatarStatus('speaking')
+            avatarMicRef.current?.pause()   // echo guard — don't transcribe the avatar
           }
           if (type === 'avatar.speak_ended') {
             isSpeakingRef.current = false
             setAvatarStatus('connected')
+            resumeAvatarMic()               // listen for the user again
           }
         } catch (e) {
           console.warn('[LA] DataReceived parse error:', e)
@@ -402,11 +483,9 @@ export default function Assistant() {
 
       await room.connect(sess.livekit_url, sess.livekit_client_token)
 
-      try {
-        await room.localParticipant.setMicrophoneEnabled(true)
-      } catch (e) {
-        console.warn('[LA] setMicrophoneEnabled error:', e)
-      }
+      // Note: we do NOT publish the mic to LiveKit. The user's voice is captured by
+      // MicRecorder → /api/stt (Whisper) → Gemma4 → avatar.speak_text (see startAvatarMic).
+      // Publishing here would double-capture the mic and isn't used (FULL mode + our own STT).
 
       // Periodic keep-alive — LiveAvatar sessions auto-close when idle.
       keepAliveIntervalRef.current = setInterval(() => {
@@ -423,6 +502,10 @@ export default function Assistant() {
         try { sendAvatarCommand(roomRef.current, 'avatar.speak_text', { text: AVATAR_GREETING }) }
         catch (e) { console.error('greeting speak error:', e) }
       }, 800)
+
+      // Voice input: mic → Whisper → Gemma4 → avatar speaks. Starts paused while
+      // the greeting plays; the greeting's speak_ended resumes it.
+      startAvatarMic()
     } catch (e) {
       console.error(e)
       stopUserCamera()
@@ -437,7 +520,7 @@ export default function Assistant() {
       setAvatarStatus('idle')
       alert('Could not start the avatar. Please try again later.')
     }
-  }, [startUserCamera, stopUserCamera])
+  }, [startUserCamera, stopUserCamera, startAvatarMic, resumeAvatarMic])
 
   // Re-attach tracks shortly after connect (timing safety from source).
   useEffect(() => {
