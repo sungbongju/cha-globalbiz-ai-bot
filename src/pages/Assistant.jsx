@@ -409,6 +409,25 @@ export default function Assistant() {
     setAvatarStatus('connected')
   }, [])
 
+  // ─── Global ESC → interrupt the avatar (works anywhere, no click needed) ───
+  // Bound to window with capture so it fires regardless of focus (input/iframe/etc).
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== 'Escape' && e.code !== 'Escape') return
+      if (mode !== 'ftf' || !sessionRef.current) return
+      e.preventDefault()
+      const t = e.target
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) t.blur()
+      interruptAvatar()
+    }
+    window.addEventListener('keydown', onKey, true)
+    document.addEventListener('keydown', onKey, true)
+    return () => {
+      window.removeEventListener('keydown', onKey, true)
+      document.removeEventListener('keydown', onKey, true)
+    }
+  }, [mode, interruptAvatar])
+
   // ─── Avatar: start session ──────────────────────────
   const startAvatar = useCallback(async () => {
     if (!window.LivekitClient) {
