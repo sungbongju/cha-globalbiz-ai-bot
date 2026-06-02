@@ -2,9 +2,9 @@
 // LiveAvatar 세션 토큰 생성 + 세션 시작 (2단계 통합)
 // Ported from cha-interview-bot-liveavatar.
 // AVATAR_ID는 비밀이 아니라 단순 식별자라 하드코딩 (env 불필요). API 키만 server-side.
-// 주의: dcaf1c6a93b94574a63bef8504bc49eb 는 인터랙티브 아바타가 아니라 "영상"이라 FTF 세션이 안 됨.
-// 그 영상으로 LiveAvatar 인터랙티브 아바타를 만들기 전까지는 기존 아바타 ID 유지.
-const PROF_PARK_AVATAR_ID = "3554efce-af84-4701-981e-2cbd46e991af"; // 박교수님 LiveAvatar (기존)
+// 박교수님 새 LiveAvatar 인터랙티브 아바타 (2026-06, 가이드 영상 싱크용으로 재제작).
+// UUID 형식 = 인터랙티브(스트리밍) 아바타. (cf. 영상 출력물은 대시 없는 32자라 스트리밍 불가)
+const PROF_PARK_AVATAR_ID = "3303593d-4571-486f-a82d-35056b0d2e2c"; // 박교수님 LiveAvatar (신규)
 
 function corsHeaders(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
