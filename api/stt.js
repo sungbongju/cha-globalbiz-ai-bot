@@ -24,6 +24,9 @@ const WHISPER_MODEL =
 // 인식률이 올라간다. 본인 봇 주제(예: 회계 용어, 낚시 용어, 학교명 등)에 맞춰
 // Vercel env WHISPER_PROMPT 에 쉼표로 구분된 단어 목록을 넣으세요. 비워두면 빈 prompt.
 const WHISPER_PROMPT = process.env.WHISPER_PROMPT || ''
+// 음성 인식 언어. globalbiz는 외국인 학생 대상(영어)이라 기본 'en'.
+// Vercel env WHISPER_LANGUAGE 로 변경: 'ko'(한국어), 'auto'(자동 감지 → language 미지정).
+const WHISPER_LANGUAGE = process.env.WHISPER_LANGUAGE || 'en'
 
 async function readRawBody(req) {
   const chunks = []
@@ -42,6 +45,12 @@ const FULL_HALLUCINATIONS = [
   '구독과 좋아요',
   '구독과 좋아요 부탁드립니다',
   '한글자막 by',
+  // 영어 무음 환각 (English silence hallucinations)
+  'Thank you.',
+  'Thank you for watching.',
+  'Thanks for watching!',
+  'Bye.',
+  'you',
 ]
 
 // whisper 결과 후처리: hallucination / 반복 패턴 제거
@@ -128,7 +137,10 @@ export default async function handler(req, res) {
     const form = new FormData()
     form.append('file', new Blob([audioBuf], { type: ct }), `audio.${ext}`)
     form.append('model', WHISPER_MODEL)
-    form.append('language', 'ko')
+    // language 미지정('auto')이면 whisper 자동 감지. 기본은 'en'(외국인 학생 대상).
+    if (WHISPER_LANGUAGE && WHISPER_LANGUAGE !== 'auto') {
+      form.append('language', WHISPER_LANGUAGE)
+    }
     form.append('response_format', 'json')
     form.append('temperature', '0')
     form.append('prompt', WHISPER_PROMPT)
