@@ -6,7 +6,8 @@ import styles from './AvatarPanel.module.css'
 const STATUS_MAP = {
   idle:       { label: 'Idle',         dot: 'gray'   },
   connecting: { label: 'Connecting…',  dot: 'yellow' },
-  connected:  { label: 'Connected',    dot: 'green'  },
+  connected:  { label: 'Listening',    dot: 'green'  },
+  thinking:   { label: 'Thinking…',    dot: 'amber'  },
   speaking:   { label: 'Speaking',     dot: 'blue'   },
 }
 
@@ -102,7 +103,7 @@ export default function AvatarPanel({
           <span className={styles.spinner} /> Connecting…
         </button>
       )}
-      {(status === 'connected' || status === 'speaking') && (
+      {(status === 'connected' || status === 'thinking' || status === 'speaking') && (
         <button
           className={styles.stopBtn}
           onClick={() => {

@@ -262,32 +262,15 @@ export default function Assistant() {
   }, [stopVoice])
 
   // ─── Avatar: speak helper ───────────────────────────
+  // Sends the text; the on-screen status flips to 'speaking' only when LiveAvatar
+  // fires the speak_started event (DataReceived) — so the display matches reality.
   const speakAvatar = useCallback((text) => {
     if (!roomRef.current || !sessionRef.current || !text) return
     isSpeakingRef.current = true
-    setAvatarStatus('speaking')
     sendAvatarCommand(roomRef.current, 'avatar.speak_text', { text })
   }, [])
 
-  // ─── Avatar: send a typed question while in avatar mode ───
-  // user text → /api/chat-stream (RAG + Gemma4) → fullText → avatar speaks it.
-  const sendAvatarMessage = useCallback(async (userText) => {
-    const text = (userText || '').trim()
-    if (!text) return
-    // Show a "thinking" state while the reply streams in.
-    isSpeakingRef.current = true
-    setAvatarStatus('speaking')
-    let reply
-    try {
-      reply = await streamChat(text)
-    } catch (e) {
-      console.warn('[avatar] chat failed:', e)
-      reply = FALLBACK_REPLY
-    }
-    speakAvatar(reply)
-  }, [speakAvatar])
-
-  // ─── Avatar Mode voice input: resume mic after the avatar finishes ───
+  // ─── Avatar Mode: resume mic after the avatar finishes / is interrupted ───
   const resumeAvatarMic = useCallback(() => {
     if (avatarSpeakSafetyRef.current) {
       clearTimeout(avatarSpeakSafetyRef.current)
@@ -298,36 +281,48 @@ export default function Assistant() {
     if (rec && rec.isRunning) rec.resume()
   }, [])
 
-  // user speech → /api/stt (Whisper) → /api/chat-stream (RAG+Gemma4) → avatar speaks.
-  const handleAvatarVoiceTranscript = useCallback(async (rawText) => {
-    const text = (rawText || '').trim()
-    if (!text || text.length < 2) return
-    if (avatarVoiceBusyRef.current) return     // a turn is already in progress
-    if (isSpeakingRef.current) return          // avatar is speaking → ignore (echo)
+  // ─── Avatar: one conversation turn (shared by typed + spoken input) ───
+  // text → 'thinking' → /api/chat-stream (RAG+Gemma4) → avatar.speak_text.
+  // Event-driven status: speak_started → 'speaking', speak_ended → 'connected'(listening).
+  const sendAvatarMessage = useCallback(async (userText) => {
+    const text = (userText || '').trim()
+    if (!text) return
+    if (avatarVoiceBusyRef.current) return        // a turn is already in progress
     if (!roomRef.current || !sessionRef.current) return
 
     avatarVoiceBusyRef.current = true
-    avatarMicRef.current?.pause()              // stop listening while we think + avatar speaks
+    isSpeakingRef.current = true                  // turn in progress (echo guard)
+    avatarMicRef.current?.pause()                 // stop listening while thinking + speaking
     setMessages(m => [...m, { role: 'user', text }])
+    setAvatarStatus('thinking')
 
     let reply
     try {
       reply = await streamChat(text)
     } catch (e) {
-      console.warn('[avatar-voice] chat failed:', e)
+      console.warn('[avatar] chat failed:', e)
       reply = FALLBACK_REPLY
     }
     setMessages(m => [...m, { role: 'bot', text: reply }])
-    speakAvatar(reply)                         // avatar speaks → speak_ended resumes the mic
+    speakAvatar(reply)                            // speak_started → 'speaking', speak_ended → 'connected'
 
-    // Safety: if speak_ended never arrives, force-resume so the mic isn't stuck.
+    // Safety: if the speak_ended event never arrives, recover after a max window.
     if (avatarSpeakSafetyRef.current) clearTimeout(avatarSpeakSafetyRef.current)
     avatarSpeakSafetyRef.current = setTimeout(() => {
       isSpeakingRef.current = false
-      setAvatarStatus(s => (s === 'speaking' ? 'connected' : s))
+      setAvatarStatus(s => (s === 'thinking' || s === 'speaking' ? 'connected' : s))
       resumeAvatarMic()
     }, 30000)
   }, [speakAvatar, resumeAvatarMic])
+
+  // user speech → STT transcript → same turn handler.
+  const handleAvatarVoiceTranscript = useCallback((rawText) => {
+    const text = (rawText || '').trim()
+    if (!text || text.length < 2) return
+    if (avatarVoiceBusyRef.current) return        // already handling a turn
+    if (isSpeakingRef.current) return             // avatar busy → ignore (echo)
+    sendAvatarMessage(text)
+  }, [sendAvatarMessage])
 
   // ─── Avatar Mode voice input: start the mic recorder ───
   const startAvatarMic = useCallback(async () => {
@@ -519,8 +514,8 @@ export default function Assistant() {
 
       // Greeting (proves the speak pipeline). Delay 800ms so the first
       // command isn't dropped before tracks finish attaching.
+      // NOTE: status comes from the avatar.speak_started event, not set here.
       isSpeakingRef.current = true
-      setAvatarStatus('speaking')
       setTimeout(() => {
         try { sendAvatarCommand(roomRef.current, 'avatar.speak_text', { text: AVATAR_GREETING }) }
         catch (e) { console.error('greeting speak error:', e) }
@@ -638,13 +633,19 @@ export default function Assistant() {
                   </div>
 
                   {/* Live conversation transcript */}
-                  {(avatarStatus === 'connected' || avatarStatus === 'speaking') && (
+                  {(avatarStatus === 'connected' || avatarStatus === 'thinking' || avatarStatus === 'speaking') && (
                     <div className="lg:flex-1 flex flex-col min-h-0 border-t lg:border-t-0 lg:border-l border-white/10">
                       <div className="px-5 py-3 flex items-center gap-2 border-b border-white/10">
                         <span className="text-white/70 text-xs font-semibold uppercase tracking-wider">Conversation</span>
                         <span className="ml-auto inline-flex items-center gap-1.5 text-xs">
-                          <span className={`w-2 h-2 rounded-full ${avatarStatus === 'speaking' ? 'bg-blue-400 animate-pulse' : 'bg-green-400'}`} />
-                          <span className="text-white/60">{avatarStatus === 'speaking' ? 'Speaking…' : 'Listening…'}</span>
+                          <span className={`w-2 h-2 rounded-full ${
+                            avatarStatus === 'speaking' ? 'bg-blue-400 animate-pulse'
+                              : avatarStatus === 'thinking' ? 'bg-[#d4a574] animate-pulse'
+                              : 'bg-green-400'}`} />
+                          <span className="text-white/60">{
+                            avatarStatus === 'speaking' ? 'Speaking…'
+                              : avatarStatus === 'thinking' ? 'Thinking…'
+                              : 'Listening…'}</span>
                         </span>
                       </div>
                       <div className="flex-1 overflow-y-auto scroll-navy px-4 py-4 space-y-3">
@@ -658,6 +659,17 @@ export default function Assistant() {
                             </div>
                           </div>
                         ))}
+                        {avatarStatus === 'thinking' && (
+                          <div className="flex justify-start">
+                            <div className="px-4 py-3 rounded-2xl rounded-bl-sm bg-white/10 border border-white/10">
+                              <span className="flex gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#d4a574] animate-bounce [animation-delay:-0.3s]" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#d4a574] animate-bounce [animation-delay:-0.15s]" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#d4a574] animate-bounce" />
+                              </span>
+                            </div>
+                          </div>
+                        )}
                         <div ref={endRef} />
                       </div>
                     </div>
@@ -665,7 +677,7 @@ export default function Assistant() {
                 </div>
 
                 {/* Talk or type — full width, bottom */}
-                {(avatarStatus === 'connected' || avatarStatus === 'speaking') && (
+                {(avatarStatus === 'connected' || avatarStatus === 'thinking' || avatarStatus === 'speaking') && (
                   <div className="p-4 border-t border-white/10 bg-[#0a1e3f]">
                     <p className="text-white/40 text-xs mb-2 text-center">🎤 Speak to the avatar, or type below</p>
                     <div className="flex gap-2">

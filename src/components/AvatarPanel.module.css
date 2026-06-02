@@ -583,6 +583,7 @@
 .dot.gray   { background: #4b5563; }
 .dot.yellow { background: #eab308; animation: blink 1s infinite; }
 .dot.green  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.dot.amber  { background: #d4a574; box-shadow: 0 0 8px #d4a574; animation: blink 1s infinite; }
 .dot.blue   { background: var(--blue); box-shadow: 0 0 8px var(--blue); animation: blink 0.8s infinite; }
 
 @keyframes blink {
