@@ -407,7 +407,10 @@ export default function Assistant() {
     }
     isSpeakingRef.current = false
     setAvatarStatus('connected')
-  }, [])
+    // Reset listening so the user can speak again right away (speak_ended won't
+    // fire on a manual interrupt). Mirrors cha-interview-bot-liveavatar.
+    resumeAvatarMic()
+  }, [resumeAvatarMic])
 
   // ─── Global ESC → interrupt the avatar (works anywhere, no click needed) ───
   // Bound to window with capture so it fires regardless of focus (input/iframe/etc).
@@ -416,6 +419,7 @@ export default function Assistant() {
       if (e.key !== 'Escape' && e.code !== 'Escape') return
       if (mode !== 'ftf' || !sessionRef.current) return
       e.preventDefault()
+      e.stopPropagation()
       const t = e.target
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) t.blur()
       interruptAvatar()
