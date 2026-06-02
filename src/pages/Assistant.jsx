@@ -597,24 +597,54 @@ export default function Assistant() {
 
             {/* FTF — real LiveAvatar */}
             {mode === 'ftf' && (
-              <div className="flex-1 flex flex-col bg-gradient-to-br from-[#0a1e3f] to-[#1a3567]">
-                <div className="flex-1 flex items-center justify-center overflow-y-auto">
-                  <AvatarPanel
-                    status={avatarStatus}
-                    videoRef={videoRef}
-                    audioRef={audioRef}
-                    userVideoRef={userVideoRef}
-                    videoReady={videoReady}
-                    cameraActive={Boolean(cameraStream)}
-                    onStart={startAvatar}
-                    onStop={stopAvatar}
-                    onInterrupt={interruptAvatar}
-                  />
+              <div className="flex-1 flex flex-col bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] min-h-0">
+                <div className="flex-1 flex flex-col lg:flex-row min-h-0">
+                  {/* Avatar (hero) */}
+                  <div className="lg:w-[44%] flex items-center justify-center overflow-y-auto p-2">
+                    <AvatarPanel
+                      status={avatarStatus}
+                      videoRef={videoRef}
+                      audioRef={audioRef}
+                      userVideoRef={userVideoRef}
+                      videoReady={videoReady}
+                      cameraActive={Boolean(cameraStream)}
+                      onStart={startAvatar}
+                      onStop={stopAvatar}
+                      onInterrupt={interruptAvatar}
+                    />
+                  </div>
+
+                  {/* Live conversation transcript */}
+                  {(avatarStatus === 'connected' || avatarStatus === 'speaking') && (
+                    <div className="lg:flex-1 flex flex-col min-h-0 border-t lg:border-t-0 lg:border-l border-white/10">
+                      <div className="px-5 py-3 flex items-center gap-2 border-b border-white/10">
+                        <span className="text-white/70 text-xs font-semibold uppercase tracking-wider">Conversation</span>
+                        <span className="ml-auto inline-flex items-center gap-1.5 text-xs">
+                          <span className={`w-2 h-2 rounded-full ${avatarStatus === 'speaking' ? 'bg-blue-400 animate-pulse' : 'bg-green-400'}`} />
+                          <span className="text-white/60">{avatarStatus === 'speaking' ? 'Speaking…' : 'Listening…'}</span>
+                        </span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+                        {messages.map((m, i) => (
+                          <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[82%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                              m.role === 'user'
+                                ? 'bg-[#d4a574] text-white rounded-br-sm'
+                                : 'bg-white/10 text-white/90 border border-white/10 rounded-bl-sm'}`}>
+                              {m.text || '…'}
+                            </div>
+                          </div>
+                        ))}
+                        <div ref={endRef} />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Type to the avatar (avatar speaks the reply) */}
+                {/* Talk or type — full width, bottom */}
                 {(avatarStatus === 'connected' || avatarStatus === 'speaking') && (
                   <div className="p-4 border-t border-white/10 bg-[#0a1e3f]">
+                    <p className="text-white/40 text-xs mb-2 text-center">🎤 Speak to the avatar, or type below</p>
                     <div className="flex gap-2">
                       <input
                         value={input}

@@ -27,7 +27,7 @@ export default function AvatarPanel({
 
   return (
     <div className={styles.panel}>
-      <div className={`${styles.mediaStage} ${styles.sideBySide}`}>
+      <div className={styles.stage}>
         {/* Avatar audio — attached as a hidden element (audio also gets a
             separate <audio> appended to body in the session logic). */}
         <audio ref={audioRef} autoPlay playsInline className={styles.hiddenMedia} />
@@ -60,24 +60,19 @@ export default function AvatarPanel({
           )}
 
           {status === 'speaking' && <div className={styles.speakGlow} />}
-        </div>
 
-        {/* User webcam — shown side by side with the avatar */}
-        <div className={`${styles.cameraPreview} ${cameraActive ? styles.cameraOn : ''}`}>
-          <video
-            ref={userVideoRef}
-            autoPlay
-            muted
-            playsInline
-            className={styles.cameraVideo}
-            style={{ opacity: cameraActive ? 1 : 0 }}
-          />
-          {!cameraActive && (
-            <div className={styles.cameraPlaceholder}>
-              <span>CAM</span>
-              <small>Your camera</small>
-            </div>
-          )}
+          {/* User webcam — small picture-in-picture in the corner */}
+          <div className={`${styles.cameraPip} ${cameraActive ? styles.cameraOn : ''}`}>
+            <video
+              ref={userVideoRef}
+              autoPlay
+              muted
+              playsInline
+              className={styles.cameraVideo}
+              style={{ opacity: cameraActive ? 1 : 0 }}
+            />
+            {!cameraActive && <span className={styles.cameraPipLabel}>CAM</span>}
+          </div>
         </div>
       </div>
 

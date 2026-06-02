@@ -40,19 +40,13 @@
   padding: clamp(12px, 2vh, 20px) clamp(20px, 4vw, 48px);
 }
 
-.mediaStage {
-  width: min(680px, 100%);
-  max-height: min(48vh, 360px);
+.stage {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(18px, 2vw, 28px);
   position: relative;
   z-index: 1;
-}
-
-.sideBySide {
-  width: min(840px, 100%);
 }
 
 .voiceStage,
@@ -70,13 +64,13 @@
   transform: translateX(-9999px);
 }
 
-/* 비디오 래퍼 */
+/* 비디오 래퍼 — 아바타가 메인(hero) */
 .videoWrap {
   position: relative;
   width: 100%;
-  max-width: 240px;
-  max-height: min(46vh, 340px);
-  aspect-ratio: 9/16;
+  max-width: 320px;
+  max-height: min(54vh, 420px);
+  aspect-ratio: 3/4;
   border-radius: 24px;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -84,15 +78,30 @@
   background: var(--media-bg);
 }
 
-.sideBySide .videoWrap,
-.sideBySide .cameraPreview {
-  /* Both videos sit side by side inside the fixed 600px Avatar Mode card,
-     leaving room for the status row + Start/Stop button below.
-     Enlarged from 220px → 290px now that the layout has spare vertical room. */
-  width: min(290px, calc(50% - 12px));
-  max-width: 290px;
-  max-height: min(46vh, 340px);
+/* 사용자 웹캠 — 아바타 코너의 작은 PIP */
+.cameraPip {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 28%;
+  max-width: 96px;
   aspect-ratio: 3/4;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  background: linear-gradient(160deg, var(--card-bg-from), var(--card-bg-to));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.cameraPipLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.5px;
 }
 
 .video {
@@ -726,7 +735,7 @@
   }
 
   .videoWrap {
-    max-width: 126px;
+    max-width: 200px;
     max-height: none;
     aspect-ratio: 3/4;
     border-radius: 18px;
