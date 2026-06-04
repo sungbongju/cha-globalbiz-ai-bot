@@ -75,23 +75,25 @@ export default function AvatarPanel({
         </div>
       </div>
 
-      {/* Status badge / interrupt.
+      {/* Status badge / interrupt — wrapped in a fixed-height slot so the
+          avatar doesn't resize when the "Stop talking" button appears/disappears
+          between speaking and listening states.
           During an active conversation (connected/thinking) the transcript
-          header already shows the live status, so we don't repeat it here —
-          only show this row before connecting. When speaking we keep the
-          "Stop talking" action (not a duplicate of the status). */}
-      {status === 'speaking' ? (
-        <button className={styles.interruptBtn} onClick={onInterrupt} type="button" aria-label="Stop talking">
-          <span className={`${styles.dot} ${styles[dot]}`} />
-          <span className={styles.pauseIcon}>||</span>
-          <span className={styles.statusLabel}>Stop talking</span>
-        </button>
-      ) : (status === 'idle' || status === 'connecting') ? (
-        <div className={styles.statusRow}>
-          <span className={`${styles.dot} ${styles[dot]}`} />
-          <span className={styles.statusLabel}>{label}</span>
-        </div>
-      ) : null}
+          header already shows the live status, so we don't repeat it here. */}
+      <div className={styles.statusSlot}>
+        {status === 'speaking' ? (
+          <button className={styles.interruptBtn} onClick={onInterrupt} type="button" aria-label="Stop talking">
+            <span className={`${styles.dot} ${styles[dot]}`} />
+            <span className={styles.pauseIcon}>||</span>
+            <span className={styles.statusLabel}>Stop talking</span>
+          </button>
+        ) : (status === 'idle' || status === 'connecting') ? (
+          <div className={styles.statusRow}>
+            <span className={`${styles.dot} ${styles[dot]}`} />
+            <span className={styles.statusLabel}>{label}</span>
+          </div>
+        ) : null}
+      </div>
 
       {/* Start / connecting / stop */}
       {status === 'idle' && (

@@ -546,6 +546,16 @@
 }
 
 /* 상태 배지 */
+/* 고정 높이 슬롯 — 발화 중 'Stop talking' 버튼이 생겨도 아바타 stage 가
+   줄어들지 않도록 상태/인터럽트 영역의 높이를 일정하게 유지한다. */
+.statusSlot {
+  min-height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .statusRow {
   display: flex;
   align-items: center;
