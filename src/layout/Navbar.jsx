@@ -97,7 +97,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        <ul className="hidden lg:flex items-center gap-7">
+        <ul className="hidden min-[1180px]:flex items-center gap-5 whitespace-nowrap">
           {menu.map(item => {
             const isActive = location.pathname === item.to
             const hasDropdown = !!item.children
@@ -180,7 +180,7 @@ export default function Navbar() {
           </li>
         </ul>
 
-        <button onClick={() => setOpen(!open)} className={`lg:hidden ${transparent ? 'text-white' : 'text-[#0a1e3f]'}`}>
+        <button onClick={() => setOpen(!open)} className={`min-[1180px]:hidden ${transparent ? 'text-white' : 'text-[#0a1e3f]'}`}>
           {open ? <X size={26} /> : <Menu size={26} />}
         </button>
       </nav>
