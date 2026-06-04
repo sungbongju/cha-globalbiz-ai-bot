@@ -111,9 +111,10 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* 9:16 source in a 3:4 box. Slightly past the top so the face sits a bit
-     higher (raises the face) while keeping the top of the head in frame. */
-  object-position: center 12%;
+  /* 9:16 source in a 3:4 box. Pull the visible window down so the face sits
+     higher in the card (source has plenty of headroom) — keeps the face clear
+     of the camera PIP in the bottom corner. */
+  object-position: center 28%;
   transition: opacity 0.5s ease;
 }
 
