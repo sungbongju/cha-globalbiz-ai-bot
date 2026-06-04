@@ -62,18 +62,22 @@ export default function AvatarPanel({
 
           {status === 'speaking' && <div className={styles.speakGlow} />}
 
-          {/* User webcam — small picture-in-picture in the corner */}
-          <div className={`${styles.cameraPip} ${cameraActive ? styles.cameraOn : ''}`}>
-            <video
-              ref={userVideoRef}
-              autoPlay
-              muted
-              playsInline
-              className={styles.cameraVideo}
-              style={{ opacity: cameraActive ? 1 : 0 }}
-            />
-            {!cameraActive && <span className={styles.cameraPipLabel}>CAM</span>}
-          </div>
+          {/* User webcam — small picture-in-picture in the corner.
+              Only shown once the avatar is live or the camera is on, so it
+              never covers the idle placeholder text. */}
+          {(videoReady || cameraActive) && (
+            <div className={`${styles.cameraPip} ${cameraActive ? styles.cameraOn : ''}`}>
+              <video
+                ref={userVideoRef}
+                autoPlay
+                muted
+                playsInline
+                className={styles.cameraVideo}
+                style={{ opacity: cameraActive ? 1 : 0 }}
+              />
+              {!cameraActive && <span className={styles.cameraPipLabel}>CAM</span>}
+            </div>
+          )}
         </div>
       </div>
 
