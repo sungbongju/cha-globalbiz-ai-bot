@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { MessageCircle, X, Sparkles, ArrowRight } from 'lucide-react'
 import { logVisit } from '../lib/auth'
 
-// 모든 페이지 우하단에 떠다니는 챗봇 위젯 (placeholder)
+// 모든 페이지 우하단에 떠다니는 챗봇 위젯 (placeholder).
+// 단, /assistant 페이지에선 본문이 곧 챗봇이라 중복 + 입력창과 겹쳐서 숨긴다.
 export default function AssistantWidget() {
   const [open, setOpen] = useState(false)
+  const { pathname } = useLocation()
+  if (pathname === '/assistant') return null
 
   return (
     <>
