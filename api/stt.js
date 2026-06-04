@@ -23,7 +23,11 @@ const WHISPER_MODEL =
 // Whisper prompt — 봇 도메인에 자주 등장하는 고유명사/전문용어를 환경변수로 주입하면
 // 인식률이 올라간다. 본인 봇 주제(예: 회계 용어, 낚시 용어, 학교명 등)에 맞춰
 // Vercel env WHISPER_PROMPT 에 쉼표로 구분된 단어 목록을 넣으세요. 비워두면 빈 prompt.
-const WHISPER_PROMPT = process.env.WHISPER_PROMPT || ''
+// 기본 프롬프트로 학과 도메인 어휘를 프라이밍 → 외국인 학생의 영어 발화에서
+// faculty/curriculum/admission 등 고유 용어 인식률을 높인다. Vercel env로 덮어쓸 수 있음.
+const WHISPER_PROMPT =
+  process.env.WHISPER_PROMPT ||
+  'CHA University Global Business AI major. Faculty, professors, curriculum, courses, admission, scholarship, tuition, career, internship, international students, Korea.'
 // 음성 인식 언어. globalbiz는 외국인 학생 대상(영어)이라 기본 'en'.
 // Vercel env WHISPER_LANGUAGE 로 변경: 'ko'(한국어), 'auto'(자동 감지 → language 미지정).
 const WHISPER_LANGUAGE = process.env.WHISPER_LANGUAGE || 'en'
@@ -101,7 +105,15 @@ function sanitizeWhisperText(text) {
   for (const t of tokens) {
     if (deduped[deduped.length - 1] !== t) deduped.push(t)
   }
-  return deduped.join(' ')
+
+  // 무음 구간에서 whisper가 뒤에 붙이는 웹/URL 환각 꼬리표 제거
+  // (예: "...scholarships are available www fema org", "subscribe dot com").
+  // 진짜 발화에는 거의 안 나오는 패턴이라 끝부분만 안전하게 잘라낸다.
+  const joined = deduped.join(' ')
+    .replace(/(^|\s)(?:www|https?:\/\/)\S*.*$/i, '')
+    .replace(/(^|\s)\S+\s+dot\s+(?:com|org|net|io|gov)\b.*$/i, '')
+    .trim()
+  return joined
 }
 
 function extFromContentType(ct) {
