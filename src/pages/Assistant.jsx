@@ -617,8 +617,8 @@ export default function Assistant() {
             {mode === 'ftf' && (
               <div className="flex-1 flex flex-col bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] min-h-0">
                 <div className="flex-1 flex flex-col lg:flex-row min-h-0">
-                  {/* Avatar (hero) */}
-                  <div className="lg:w-[44%] flex items-center justify-center overflow-y-auto scroll-navy p-2">
+                  {/* Avatar (hero) — fits the section height, no scroll */}
+                  <div className="lg:w-[44%] flex items-center justify-center overflow-hidden min-h-0 p-2">
                     <AvatarPanel
                       status={avatarStatus}
                       videoRef={videoRef}
