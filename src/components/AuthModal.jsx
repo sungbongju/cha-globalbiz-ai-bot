@@ -26,19 +26,19 @@ export default function AuthModal({ open, onClose, onSuccess }) {
 
   const submit = async () => {
     setError('')
-    if (!email || !password) { setError('이메일과 비밀번호를 입력해 주세요.'); return }
-    if (mode === 'signup' && !name) { setError('이름(닉네임)을 입력해 주세요.'); return }
-    if (mode === 'signup' && password.length < 6) { setError('비밀번호는 6자 이상이어야 해요.'); return }
+    if (!email || !password) { setError('Please enter your email and password.'); return }
+    if (mode === 'signup' && !name) { setError('Please enter your name (nickname).'); return }
+    if (mode === 'signup' && password.length < 6) { setError('Password must be at least 6 characters.'); return }
     setLoading(true)
     try {
       const r = mode === 'login'
         ? await emailLogin(email, password)
         : await emailSignup(email, password, name)
-      if (!r.success) { setError(r.error || '실패했어요. 다시 시도해 주세요.'); setLoading(false); return }
+      if (!r.success) { setError(r.error || 'Something went wrong. Please try again.'); setLoading(false); return }
       onSuccess?.(r.user)
       onClose?.()
     } catch {
-      setError('네트워크 오류가 발생했어요.')
+      setError('A network error occurred.')
     } finally {
       setLoading(false)
     }
@@ -69,7 +69,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
             CHA
           </div>
           <h3 className="mt-4 text-white text-xl font-bold tracking-wide">
-            {mode === 'login' ? '로그인' : '회원가입'}
+            {mode === 'login' ? 'Sign in' : 'Sign up'}
           </h3>
           <p className="mt-1 text-white/70 text-sm">
             Global Business AI · CHA University
@@ -83,19 +83,19 @@ export default function AuthModal({ open, onClose, onSuccess }) {
               className={`flex-1 py-2 text-sm font-semibold rounded-full transition
                 ${mode === 'login' ? 'bg-[#0a1e3f] text-white shadow' : 'text-gray-500 hover:text-[#0a1e3f]'}`}
               onClick={() => { setMode('login'); setError('') }}
-            >로그인</button>
+            >Sign in</button>
             <button
               className={`flex-1 py-2 text-sm font-semibold rounded-full transition
                 ${mode === 'signup' ? 'bg-[#0a1e3f] text-white shadow' : 'text-gray-500 hover:text-[#0a1e3f]'}`}
               onClick={() => { setMode('signup'); setError('') }}
-            >회원가입</button>
+            >Sign up</button>
           </div>
 
           {mode === 'signup' && (
             <input
               className="w-full mb-3 px-4 py-3 rounded-xl border border-gray-200 text-sm
                 focus:outline-none focus:ring-2 focus:ring-[#d4a574]/60 focus:border-[#d4a574]"
-              placeholder="이름 (닉네임)"
+              placeholder="Name (nickname)"
               value={name}
               onChange={e => setName(e.target.value)}
             />
@@ -104,7 +104,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
             className="w-full mb-3 px-4 py-3 rounded-xl border border-gray-200 text-sm
               focus:outline-none focus:ring-2 focus:ring-[#d4a574]/60 focus:border-[#d4a574]"
             type="email"
-            placeholder="이메일"
+            placeholder="Email"
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
@@ -112,7 +112,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
             className="w-full mb-3 px-4 py-3 rounded-xl border border-gray-200 text-sm
               focus:outline-none focus:ring-2 focus:ring-[#d4a574]/60 focus:border-[#d4a574]"
             type="password"
-            placeholder="비밀번호 (6자 이상)"
+            placeholder="Password (6+ characters)"
             value={password}
             onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && submit()}
@@ -130,14 +130,14 @@ export default function AuthModal({ open, onClose, onSuccess }) {
             className="w-full py-3 rounded-xl bg-[#d4a574] text-white text-sm font-semibold
               shadow-lg shadow-[#d4a574]/30 hover:bg-[#c19463] transition disabled:opacity-60"
           >
-            {loading ? '처리 중…' : (mode === 'login' ? '로그인' : '회원가입')}
+            {loading ? 'Processing…' : (mode === 'login' ? 'Sign in' : 'Sign up')}
           </button>
 
           <button
             onClick={onClose}
             className="w-full mt-3 py-2 text-sm text-gray-500 hover:text-[#0a1e3f] transition"
           >
-            로그인 없이 둘러보기
+            Continue without signing in
           </button>
         </div>
         </div>

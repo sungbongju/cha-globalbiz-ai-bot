@@ -154,8 +154,8 @@ export default function Navbar() {
                 </span>
                 <button
                   onClick={handleLogout}
-                  aria-label="Logout"
-                  title="로그아웃"
+                  aria-label="Sign out"
+                  title="Sign out"
                   className={`p-1.5 rounded-full transition hover:text-[#d4a574]
                     ${transparent ? 'text-white/70' : 'text-gray-500'}`}>
                   <LogOut size={16} />
@@ -231,7 +231,7 @@ export default function Navbar() {
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#d4a574]">
-                <LogOut size={15} /> 로그아웃
+                <LogOut size={15} /> Sign out
               </button>
             </div>
           ) : (

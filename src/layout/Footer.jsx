@@ -75,7 +75,6 @@ export default function Footer() {
           <div className="flex gap-6">
             <a href="#" className="hover:text-white">Privacy</a>
             <a href="#" className="hover:text-white">Terms</a>
-            <a href="#" className="hover:text-white">한국어 (Korean)</a>
           </div>
         </div>
       </div>
