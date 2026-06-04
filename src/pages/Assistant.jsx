@@ -618,7 +618,7 @@ export default function Assistant() {
               <div className="flex-1 flex flex-col bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] min-h-0">
                 <div className="flex-1 flex flex-col lg:flex-row min-h-0">
                   {/* Avatar (hero) — fits the section height, no scroll */}
-                  <div className="lg:w-[44%] flex items-center justify-center overflow-hidden min-h-0 p-2">
+                  <div className="lg:w-[44%] shrink-0 flex items-center justify-center overflow-hidden min-h-0 p-2">
                     <AvatarPanel
                       status={avatarStatus}
                       videoRef={videoRef}
@@ -634,7 +634,7 @@ export default function Assistant() {
 
                   {/* Live conversation transcript */}
                   {(avatarStatus === 'connected' || avatarStatus === 'thinking' || avatarStatus === 'speaking') && (
-                    <div className="lg:flex-1 flex flex-col min-h-0 border-t lg:border-t-0 lg:border-l border-white/10">
+                    <div className="flex-1 min-h-0 flex flex-col border-t lg:border-t-0 lg:border-l border-white/10">
                       <div className="px-5 py-3 flex items-center gap-2 border-b border-white/10">
                         <span className="text-white/70 text-xs font-semibold uppercase tracking-wider">Conversation</span>
                         <span className="ml-auto inline-flex items-center gap-1.5 text-xs">
@@ -691,7 +691,7 @@ export default function Assistant() {
                           }
                         }}
                         placeholder="Ask the avatar a question..."
-                        className="flex-1 px-5 py-3 rounded-full border border-white/20 bg-white/10 text-white
+                        className="flex-1 min-w-0 px-5 py-3 rounded-full border border-white/20 bg-white/10 text-white
                           placeholder:text-white/50 focus:border-[#d4a574] focus:ring-2 focus:ring-[#d4a574]/30 outline-none"
                       />
                       <button

@@ -42,7 +42,7 @@
 
 .stage {
   width: 100%;
-  flex: 1 1 auto;
+  flex: 1 1 0%;            /* basis 0 — avoids the height:100% ↔ basis:auto feedback loop that shrank the avatar each render */
   min-height: 0;
   display: flex;
   align-items: center;
@@ -111,6 +111,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;   /* keep the head in frame (9:16 source in 3:4 box) */
   transition: opacity 0.5s ease;
 }
 
@@ -689,11 +690,16 @@
 @media (max-width: 768px) {
   .panel {
     width: 100%;
-    height: 47%;
-    min-height: 372px;
-    padding: 16px 16px 12px;
-    gap: 5px;
+    height: auto;          /* size to content so the avatar cell stays compact and the transcript/input keep room */
+    min-height: 0;
+    padding: 12px 14px 10px;
+    gap: 6px;
     border-bottom: 1px solid var(--border);
+  }
+
+  /* On mobile the stage sizes to the (capped) video, not to flex free space. */
+  .stage {
+    flex: 0 0 auto;
   }
 
   .mediaStage,
@@ -739,12 +745,12 @@
   }
 
   .videoWrap {
-    /* Mobile: width-driven portrait card (height:100% + aspect-ratio collapses
-       inside the flex column on small screens, so pin the width instead). */
-    width: min(210px, 64vw);
-    height: auto;
-    max-width: 210px;
-    max-height: 100%;
+    /* Mobile: height-capped portrait so the avatar never hogs the section
+       (leaves room for the End button, transcript and input). */
+    width: auto;
+    height: min(196px, 30vh);
+    max-height: 196px;
+    max-width: 78vw;
     aspect-ratio: 3/4;
     border-radius: 18px;
   }
@@ -886,15 +892,17 @@
   }
 }
 
-/* 매우 작은 화면 (≤380px) — 아바타가 hero라 폭을 충분히 준다 */
+/* 매우 작은 화면 (≤380px) — 세로 여유가 적어 아바타를 조금 더 낮춘다 */
 @media (max-width: 380px) {
   .panel {
-    height: 48%;
-    min-height: 360px;
+    height: auto;
+    min-height: 0;
   }
   .videoWrap {
-    width: min(190px, 58vw);
-    max-width: 190px;
+    width: auto;
+    height: min(176px, 27vh);
+    max-height: 176px;
+    max-width: 72vw;
   }
 
   .cameraPreview {
