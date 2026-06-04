@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { emailLogin, emailSignup } from '../lib/auth'
 
@@ -44,7 +45,10 @@ export default function AuthModal({ open, onClose, onSuccess }) {
     }
   }
 
-  return (
+  // Portal to <body> so the overlay isn't trapped by the navbar's
+  // backdrop-filter (which would make `fixed inset-0` resolve against the
+  // header box instead of the viewport, hiding the modal when scrolled).
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] overflow-y-auto bg-black/50 backdrop-blur-sm"
       onClick={onClose}
@@ -142,6 +146,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
         </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
