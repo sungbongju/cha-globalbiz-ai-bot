@@ -111,7 +111,9 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;   /* keep the head in frame (9:16 source in 3:4 box) */
+  /* 9:16 source in a 3:4 box. Slightly past the top so the face sits a bit
+     higher (raises the face) while keeping the top of the head in frame. */
+  object-position: center 12%;
   transition: opacity 0.5s ease;
 }
 
