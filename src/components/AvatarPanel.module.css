@@ -739,8 +739,12 @@
   }
 
   .videoWrap {
-    max-width: 200px;
-    max-height: none;
+    /* Mobile: width-driven portrait card (height:100% + aspect-ratio collapses
+       inside the flex column on small screens, so pin the width instead). */
+    width: min(210px, 64vw);
+    height: auto;
+    max-width: 210px;
+    max-height: 100%;
     aspect-ratio: 3/4;
     border-radius: 18px;
   }
@@ -882,14 +886,15 @@
   }
 }
 
-/* 매우 작은 화면 (≤380px) */
+/* 매우 작은 화면 (≤380px) — 아바타가 hero라 폭을 충분히 준다 */
 @media (max-width: 380px) {
   .panel {
     height: 48%;
     min-height: 360px;
   }
   .videoWrap {
-    max-width: 110px;
+    width: min(190px, 58vw);
+    max-width: 190px;
   }
 
   .cameraPreview {
