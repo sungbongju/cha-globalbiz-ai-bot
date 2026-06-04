@@ -46,13 +46,16 @@ export default function AuthModal({ open, onClose, onSuccess }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-[100] overflow-y-auto bg-black/50 backdrop-blur-sm"
       onClick={onClose}
     >
-      <div
-        className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden"
-        onClick={e => e.stopPropagation()}
-      >
+      {/* min-h-full + items-center: centered when it fits, scrolls when the
+          modal is taller than the viewport (e.g. signup on short screens). */}
+      <div className="flex min-h-dvh items-center justify-center p-4">
+        <div
+          className="relative w-full max-w-md my-4 rounded-2xl bg-white shadow-2xl overflow-hidden"
+          onClick={e => e.stopPropagation()}
+        >
         {/* navy header */}
         <div className="bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] px-8 pt-8 pb-10 text-center">
           <button
@@ -136,6 +139,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
           >
             로그인 없이 둘러보기
           </button>
+        </div>
         </div>
       </div>
     </div>
