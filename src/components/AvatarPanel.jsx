@@ -51,14 +51,8 @@ export default function AvatarPanel({
             </div>
           )}
 
-          {videoReady && (
-            <div className={styles.nameplate}>
-              <div className={styles.nameplateInner}>
-                <span className={styles.nameplateName}>GBA Assistant</span>
-                <span className={styles.nameplateSub}>Global Business AI · CHA University</span>
-              </div>
-            </div>
-          )}
+          {/* Nameplate caption removed — it overlapped the avatar's mouth/chin.
+              The bot identity is already shown in the conversation header. */}
 
           {status === 'speaking' && <div className={styles.speakGlow} />}
 
