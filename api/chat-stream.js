@@ -8,9 +8,11 @@
 //   data: {"token":"..."}\n\n      (repeated)
 //   data: {"done":true,"fullText":"...","ragHits":N}\n\n
 //   data: [DONE]\n\n
+// Dedicated GBA route (globalbiz-chat.js), decoupled from the competition
+// team-chat.js. Supports background recognition via userContext.
 const UPSTREAM =
   process.env.ONPREMISE_CHAT_STREAM_URL ||
-  'https://middleton.p-e.kr/finbot/api/team/90/chat-stream'
+  'https://middleton.p-e.kr/finbot/api/globalbiz/chat-stream'
 
 export const config = {
   // Node function — keep bodyParser on, disable the response limit for streaming.
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'method not allowed' })
 
-  const { message, history = [], images = [] } = req.body || {}
+  const { message, history = [], images = [], userContext = null } = req.body || {}
   if (!message) return res.status(400).json({ error: 'message required' })
 
   // SSE response headers
@@ -40,7 +42,7 @@ export default async function handler(req, res) {
     upstream = await fetch(UPSTREAM, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history, images }),
+      body: JSON.stringify({ message, history, images, userContext }),
     })
   } catch (e) {
     res.write(`data: ${JSON.stringify({ error: 'upstream connect failed: ' + e.message })}\n\n`)

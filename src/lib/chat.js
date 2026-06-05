@@ -1,9 +1,25 @@
 // src/lib/chat.js
 // Browser-side client for the streaming chat proxy (/api/chat-stream), which
-// fronts the Middleton team-90 RAG + Gemma4 backend.
+// fronts the Middleton GBA RAG + Gemma4 backend (dedicated globalbiz route).
 //
 // Reads the SSE stream token-by-token so callers can render a live typing
 // effect, and resolves with the final full text when the stream completes.
+//
+// Background recognition: if the visitor is logged in, we attach a small
+// userContext (name + visit count) so the bot can greet them by name and
+// acknowledge returning visitors. No PII beyond what the bot needs is sent.
+import { getUser } from './auth'
+
+function buildUserContext() {
+  try {
+    const u = getUser()
+    if (!u) return null
+    const ctx = {}
+    if (u.name) ctx.name = u.name
+    if (u.visit_count != null) ctx.visitCount = u.visit_count
+    return Object.keys(ctx).length ? ctx : null
+  } catch { return null }
+}
 
 /**
  * Send a user message to /api/chat-stream and stream the reply.
@@ -19,10 +35,11 @@
  */
 export async function streamChat(message, opts = {}) {
   const endpoint = opts.endpoint || '/api/chat-stream'
+  const userContext = opts.userContext !== undefined ? opts.userContext : buildUserContext()
   const res = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, history: opts.history || [], images: [] }),
+    body: JSON.stringify({ message, history: opts.history || [], images: [], userContext }),
     signal: opts.signal,
   })
   if (!res.ok || !res.body) {
