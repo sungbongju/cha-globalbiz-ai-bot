@@ -83,6 +83,13 @@ export default function SurveyModal({
 
   const applicableQuestions = TRUST_QUESTIONS.filter(isQuestionApplicable)
   const totalRequired = applicableQuestions.length + 1 // +1 = overall
+
+  // Sequential display numbers in the order the respondent actually sees them
+  // (layers 1–5 → overall last). The DB column names (q06…q27) keep the original
+  // numbers; only the on-screen "Q#" is renumbered so it isn't out of order
+  // (e.g. Q24 appearing after Q27, Q23 missing).
+  const displayNum = {}
+  ;[...applicableQuestions, OVERALL_QUESTION].forEach((q, i) => { displayNum[q.code] = i + 1 })
   const totalAnswered =
     applicableQuestions.filter(q => answers[q.code] === 0 || answers[q.code] === 1).length
     + (overall === 0 || overall === 1 ? 1 : 0)
@@ -140,7 +147,7 @@ export default function SurveyModal({
     return (
       <div key={q.code} className="mb-3 rounded-xl border border-gray-100 bg-[#faf8f3] p-3.5">
         <div className="text-sm leading-relaxed text-[#0a1e3f]">
-          <span className="font-bold text-[#d4a574]">Q{q.num}.</span> {q.text}
+          <span className="font-bold text-[#d4a574]">Q{displayNum[q.code] ?? q.num}.</span> {q.text}
         </div>
         <div className="mt-2.5 flex gap-2">
           <button
