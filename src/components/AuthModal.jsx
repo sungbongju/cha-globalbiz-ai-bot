@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { emailLogin, emailSignup } from '../lib/auth'
+import { COUNTRIES, TRACKS } from '../lib/trustComponents'
 
 // 이메일 + 비밀번호 + 닉네임(이름) 회원가입/로그인 모달.
 // navy(#0a1e3f) / gold(#d4a574) 테마. 카카오 로그인 없음.
@@ -10,6 +11,8 @@ export default function AuthModal({ open, onClose, onSuccess }) {
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [name, setName]         = useState('')
+  const [country, setCountry]   = useState('')
+  const [track, setTrack]       = useState('')
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
 
@@ -19,7 +22,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
       setMode('login')
       setError('')
       setLoading(false)
-      setEmail(''); setPassword(''); setName('')
+      setEmail(''); setPassword(''); setName(''); setCountry(''); setTrack('')
     }
   }, [open])
 
@@ -34,7 +37,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
     try {
       const r = mode === 'login'
         ? await emailLogin(email, password)
-        : await emailSignup(email, password, name)
+        : await emailSignup(email, password, name, country || null, track || null)
       if (!r.success) { setError(r.error || 'Something went wrong. Please try again.'); setLoading(false); return }
       onSuccess?.(r.user)
       onClose?.()
@@ -96,13 +99,35 @@ export default function AuthModal({ open, onClose, onSuccess }) {
           </div>
 
           {mode === 'signup' && (
-            <input
-              className="w-full mb-3 px-4 py-3 rounded-xl border border-gray-200 text-sm
-                focus:outline-none focus:ring-2 focus:ring-[#d4a574]/60 focus:border-[#d4a574]"
-              placeholder="Name (nickname)"
-              value={name}
-              onChange={e => setName(e.target.value)}
-            />
+            <>
+              <input
+                className="w-full mb-3 px-4 py-3 rounded-xl border border-gray-200 text-sm
+                  focus:outline-none focus:ring-2 focus:ring-[#d4a574]/60 focus:border-[#d4a574]"
+                placeholder="Name (nickname)"
+                value={name}
+                onChange={e => setName(e.target.value)}
+              />
+              <div className="flex gap-3 mb-3">
+                <select
+                  className="w-1/2 px-3 py-3 rounded-xl border border-gray-200 text-sm bg-white text-gray-700
+                    focus:outline-none focus:ring-2 focus:ring-[#d4a574]/60 focus:border-[#d4a574]"
+                  value={country}
+                  onChange={e => setCountry(e.target.value)}
+                >
+                  <option value="">Country</option>
+                  {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <select
+                  className="w-1/2 px-3 py-3 rounded-xl border border-gray-200 text-sm bg-white text-gray-700
+                    focus:outline-none focus:ring-2 focus:ring-[#d4a574]/60 focus:border-[#d4a574]"
+                  value={track}
+                  onChange={e => setTrack(e.target.value)}
+                >
+                  <option value="">Interest track</option>
+                  {TRACKS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+            </>
           )}
           <input
             className="w-full mb-3 px-4 py-3 rounded-xl border border-gray-200 text-sm

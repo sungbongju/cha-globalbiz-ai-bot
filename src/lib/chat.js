@@ -10,6 +10,12 @@
 // acknowledge returning visitors. No PII beyond what the bot needs is sent.
 import { getUser } from './auth'
 
+const TRACK_LABELS = {
+  business: 'Business Management',
+  ai: 'Artificial Intelligence',
+  both: 'Both Business & AI (undecided)',
+}
+
 function buildUserContext() {
   try {
     const u = getUser()
@@ -17,6 +23,8 @@ function buildUserContext() {
     const ctx = {}
     if (u.name) ctx.name = u.name
     if (u.visit_count != null) ctx.visitCount = u.visit_count
+    if (u.country) ctx.country = u.country
+    if (u.track) ctx.track = TRACK_LABELS[u.track] || u.track
     return Object.keys(ctx).length ? ctx : null
   } catch { return null }
 }

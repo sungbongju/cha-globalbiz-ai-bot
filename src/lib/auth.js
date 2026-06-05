@@ -40,8 +40,8 @@ async function call(action, payload = {}) {
   return res.json()
 }
 
-export async function emailSignup(email, password, name) {
-  const r = await call('email_signup', { email, password, name })
+export async function emailSignup(email, password, name, country = null, track = null) {
+  const r = await call('email_signup', { email, password, name, country, track })
   if (r.success) setAuth(r.token, r.user)
   return r
 }
