@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { Award, ArrowRight, TrendingUp, Building2, Rocket } from 'lucide-react'
+import { Award, ArrowRight, TrendingUp, Building2, Rocket,
+  Layers, Compass, Megaphone, Calculator, Stethoscope, BarChart3 } from 'lucide-react'
 import PageHero from '../components/PageHero'
 
 const careers = [
@@ -15,30 +16,63 @@ const careers = [
   { name: 'Cross-Border Platform Enterprise', industry: 'Tech' },
 ]
 
+// Career tracks mirror the official 진로별 로드맵 (Business Management major),
+// adapted to English. The last two are convergence tracks with the Digital
+// Health / AI Medical Data Science majors.
 const tracks = [
   {
-    icon: Building2,
-    title: 'Bio-Healthcare Industry',
-    desc: 'Global pharmaceutical and biotech corporations, digital health ventures, and healthcare consulting firms — the frontier where life sciences meet AI strategy.',
-    companies: ['Pharma & Biotech', 'Digital Health', 'Hospital Networks', 'Clinical Research'],
-    img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80&auto=format&fit=crop',
+    icon: Layers,
+    title: 'Common Foundation',
+    ko: '전공공통',
+    desc: 'Every student starts here — a shared core that builds business fundamentals before you choose a specialization.',
+    companies: ['Management', 'Economics', 'Marketing', 'Accounting', 'Finance', 'CHA Bio Capstone'],
+    img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80&auto=format&fit=crop',
     color: 'from-[#0a1e3f] to-[#1a3567]'
   },
   {
-    icon: Rocket,
-    title: 'Advanced Manufacturing & Tech',
-    desc: 'Semiconductor and battery enterprises, platform companies, and K-content & K-beauty global brands — leveraging your bilingual fluency in business and AI.',
-    companies: ['Semiconductors', 'Batteries', 'Platform Enterprises', 'K-Content / K-Beauty'],
-    img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80&auto=format&fit=crop',
+    icon: Compass,
+    title: 'Business Planning',
+    ko: '경영기획',
+    desc: 'Analyze business trends and design strategy — organizational & technology management and corporate strategy.',
+    companies: ['Hospital Strategy Offices', 'Public Agencies', 'IT & Cloud', 'Manufacturing & Logistics', 'VC & Startups'],
+    img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80&auto=format&fit=crop',
     color: 'from-[#d4a574] to-[#c19463]'
   },
   {
-    icon: TrendingUp,
-    title: 'Investment & Policy',
-    desc: 'Life-science investment institutions and public agencies shaping technology and trade policy across borders — the strategic architects of national competitiveness.',
-    companies: ['Life-Science VC', 'Policy Agencies', 'Cross-border Trade', 'Strategic Consulting'],
-    img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80&auto=format&fit=crop',
+    icon: Megaphone,
+    title: 'Marketing',
+    ko: '마케팅',
+    desc: 'Consumer insight and marketing planning with a global-market lens — understanding and responding to markets worldwide.',
+    companies: ['Pharma / Bio Marketing', 'Retail & E-commerce', 'Service Marketing', 'Global Markets'],
+    img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80&auto=format&fit=crop',
     color: 'from-[#e8775c] to-[#c95a44]'
+  },
+  {
+    icon: Calculator,
+    title: 'Accounting & Finance',
+    ko: '회계재무',
+    desc: 'Read financial statements and markets — accounting & tax practice, investment analysis and corporate valuation.',
+    companies: ['Accounting & Tax Firms', 'Banks & Securities', 'Insurance & Asset Mgmt', 'FinTech'],
+    img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80&auto=format&fit=crop',
+    color: 'from-[#2a7f8f] to-[#1c5a66]'
+  },
+  {
+    icon: Stethoscope,
+    title: 'Healthcare Business',
+    ko: '헬스케어 비즈니스 · 융합',
+    desc: 'A convergence track with the Digital Health major — plan and run convergence research across the healthcare industry.',
+    companies: ['Pharma & Bio', 'Hospitals', 'Beauty & Cosmetics', 'Medical Devices'],
+    img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80&auto=format&fit=crop',
+    color: 'from-[#4a8f6d] to-[#356b50]'
+  },
+  {
+    icon: BarChart3,
+    title: 'Business Analytics',
+    ko: '비즈니스 애널리틱스 · 융합',
+    desc: 'A convergence track with the AI Medical Data Science major — data-driven market analysis and business modeling.',
+    companies: ['IT & Cloud', 'Financial Institutions', 'Gaming & Entertainment', 'BI & Machine Learning'],
+    img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&auto=format&fit=crop',
+    color: 'from-[#6d4a6e] to-[#4a3050]'
   },
 ]
 
@@ -60,8 +94,12 @@ export default function Career() {
             </div>
             <h2 className="text-4xl font-bold text-[#0a1e3f]"
               style={{ fontFamily: "'Playfair Display', serif" }}>
-              Three paths, infinite possibilities
+              Six tracks, one global degree
             </h2>
+            <p className="mt-4 text-gray-600">
+              Specialization roadmaps from the Business Management major — including two convergence tracks
+              shared with the Digital Health and AI Medical Data Science majors.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -85,10 +123,15 @@ export default function Career() {
                   </div>
                 </div>
                 <div className="p-7">
-                  <h3 className="text-2xl font-bold text-[#0a1e3f] mb-3"
+                  <h3 className="text-2xl font-bold text-[#0a1e3f] mb-1"
                     style={{ fontFamily: "'Playfair Display', serif" }}>
                     {t.title}
                   </h3>
+                  {t.ko && (
+                    <div className="text-xs font-semibold uppercase tracking-wider text-[#d4a574] mb-3">
+                      {t.ko}
+                    </div>
+                  )}
                   <p className="text-gray-600 leading-relaxed mb-5">{t.desc}</p>
                   <div className="flex flex-wrap gap-2">
                     {t.companies.map(c => (
