@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { X } from 'lucide-react'
-import { saveSurvey, getSessionId } from '../lib/auth'
+import { saveSurvey, getSessionId, getUser } from '../lib/auth'
 import {
   TRUST_QUESTIONS, OVERALL_QUESTION, LAYER_LABELS,
   COUNTRIES, TRACKS, AGE_BANDS, GENDER_OPTIONS, MBTI_LIST,
@@ -37,6 +37,8 @@ export default function SurveyModal({
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
+  const [started, setStarted] = useState(false)   // intro/sign-in gate shown first
+  const [user, setUser] = useState(null)
   const startedAtRef = useRef(0)
   // Re-read localStorage each time the modal opens so modes tried this session count.
   const [storedModes, setStoredModes] = useState([])
@@ -64,6 +66,8 @@ export default function SurveyModal({
     if (open) {
       startedAtRef.current = Date.now()
       setDone(false)
+      setStarted(false)
+      setUser(getUser())
       setError('')
       setStoredModes(readModesUsed())
     }
@@ -202,6 +206,63 @@ export default function SurveyModal({
               className="mt-6 w-full py-3 rounded-xl bg-[#d4a574] text-white text-sm font-semibold
                 shadow-lg shadow-[#d4a574]/30 hover:bg-[#c19463] transition"
             >Close</button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── Intro + sign-in gate ───────────────────────────────────────────
+  // Shown first (the "README" the professor asked for). Nudges sign-in so the
+  // background-recognition treatment is actually delivered and responses link to
+  // a user — the core data quality fix for the study.
+  if (!started) {
+    const goSignIn = () => {
+      try { sessionStorage.setItem('gba_pending_survey', '1') } catch { /* ignore */ }
+      onClose()
+      window.dispatchEvent(new Event('gba-open-auth'))
+    }
+    return (
+      <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/50 backdrop-blur-sm px-4 py-6">
+        <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden my-6">
+          <div className="bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] px-6 py-5">
+            <button onClick={onClose} aria-label="Close"
+              className="absolute top-4 right-4 text-white/70 hover:text-white transition"><X size={22} /></button>
+            <h2 className="text-white text-lg font-bold">Quick survey · the AI avatar</h2>
+            <p className="mt-1 text-white/70 text-sm">About 2 minutes · your honest Yes / No helps our research</p>
+          </div>
+          <div className="px-6 py-6">
+            <ul className="space-y-2.5 text-sm text-gray-700 mb-5">
+              <li className="flex gap-2"><span className="text-[#d4a574] font-bold">1.</span>
+                <span>This is about <b>your experience just now</b> with the AI assistant — avatar, voice, or text.</span></li>
+              <li className="flex gap-2"><span className="text-[#d4a574] font-bold">2.</span>
+                <span>Each question is a simple <b>Yes / No</b>. Answer honestly — there are no right answers.</span></li>
+              <li className="flex gap-2"><span className="text-[#d4a574] font-bold">3.</span>
+                <span>It takes about <b>2 minutes</b>.</span></li>
+            </ul>
+            {user ? (
+              <>
+                <div className="mb-4 flex items-center gap-2 text-sm text-[#0a1e3f] bg-[#f3f8f3] border border-green-100 rounded-xl px-4 py-2.5">
+                  <span className="w-2 h-2 rounded-full bg-green-500" /> Signed in as <b>{user.name}</b>
+                </div>
+                <button onClick={() => setStarted(true)}
+                  className="w-full py-3 rounded-xl bg-[#d4a574] text-white text-sm font-semibold
+                    shadow-lg shadow-[#d4a574]/30 hover:bg-[#c19463] transition">Start the survey</button>
+              </>
+            ) : (
+              <>
+                <div className="mb-4 rounded-xl border border-[#ecd9a8] bg-[#fef8ee] px-4 py-3 text-sm text-[#0a1e3f] leading-relaxed">
+                  <b>Please sign in first.</b> Signing in lets the assistant recognize you and links your answers to your
+                  visit — this is important for the study.
+                </div>
+                <button onClick={goSignIn}
+                  className="w-full py-3 rounded-xl bg-[#0a1e3f] text-white text-sm font-semibold shadow-lg hover:bg-[#16335f] transition mb-2">
+                  Sign in &amp; continue
+                </button>
+                <button onClick={() => setStarted(true)}
+                  className="w-full py-2.5 text-sm text-gray-500 hover:text-[#0a1e3f] transition">Continue without signing in</button>
+              </>
+            )}
           </div>
         </div>
       </div>

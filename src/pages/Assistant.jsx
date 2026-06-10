@@ -11,7 +11,7 @@ import {
 import { MicRecorder, isMicRecorderSupported } from '../lib/stt'
 import { speak as ttsSpeak, stopSpeaking as ttsStop } from '../lib/tts'
 import { streamChat } from '../lib/chat'
-import { getUser } from '../lib/auth'
+import { getUser, logVisit } from '../lib/auth'
 
 const FALLBACK_REPLY =
   "Sorry — I couldn't reach the assistant just now. Please try again in a moment."
@@ -924,6 +924,23 @@ export default function Assistant() {
                 </div>
               </>
             )}
+          </div>
+
+          {/* Finished trying it? → survey (so the survey isn't buried at the page bottom) */}
+          <div className="mt-6 rounded-2xl border border-[#ecd9a8] bg-[#fef8ee] px-5 py-4 sm:px-6 sm:py-5
+            flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+            <div className="flex-1">
+              <div className="text-[15px] font-bold text-[#0a1e3f]">Done trying the assistant?</div>
+              <div className="text-[13px] text-gray-600">
+                Please share your experience — about 2 minutes, and it supports our research.
+              </div>
+            </div>
+            <button
+              onClick={() => { logVisit('action', 'survey_open_assistant'); window.dispatchEvent(new Event('gba-open-survey')) }}
+              className="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0a1e3f] text-white
+                text-sm font-semibold shadow-lg hover:bg-[#16335f] transition">
+              Take the 2-min survey <ArrowRight size={16} />
+            </button>
           </div>
 
           <div className="mt-6 text-center text-xs text-gray-400 flex items-center justify-center gap-2">

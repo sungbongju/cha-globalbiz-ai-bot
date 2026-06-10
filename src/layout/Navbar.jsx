@@ -115,9 +115,23 @@ export default function Navbar() {
     }
   }, [])
 
+  // Open the login modal on demand (e.g. the survey's "Sign in & continue" gate).
+  useEffect(() => {
+    const openAuth = () => setAuthOpen(true)
+    window.addEventListener('gba-open-auth', openAuth)
+    return () => window.removeEventListener('gba-open-auth', openAuth)
+  }, [])
+
   const handleAuthSuccess = (u) => {
     setUser(u)
     window.dispatchEvent(new Event('gba-auth-changed'))
+    // If they came from the survey's sign-in gate, return them to the survey.
+    try {
+      if (sessionStorage.getItem('gba_pending_survey')) {
+        sessionStorage.removeItem('gba_pending_survey')
+        window.dispatchEvent(new Event('gba-open-survey'))
+      }
+    } catch { /* sessionStorage unavailable */ }
   }
   const handleLogout = () => {
     clearAuth()
