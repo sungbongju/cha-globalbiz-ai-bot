@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Sparkles, Send, User, Bot, Video, Mic, MessageSquare } from 'lucide-react'
+import { Sparkles, Send, User, Bot, Video, Mic, MessageSquare, ArrowRight, LogIn } from 'lucide-react'
 import PageHero from '../components/PageHero'
 import AvatarPanel from '../components/AvatarPanel'
 import {
@@ -11,6 +11,7 @@ import {
 import { MicRecorder, isMicRecorderSupported } from '../lib/stt'
 import { speak as ttsSpeak, stopSpeaking as ttsStop } from '../lib/tts'
 import { streamChat } from '../lib/chat'
+import { getUser } from '../lib/auth'
 
 const FALLBACK_REPLY =
   "Sorry — I couldn't reach the assistant just now. Please try again in a moment."
@@ -32,7 +33,8 @@ function recordModeUsed(mode) {
 }
 
 export default function Assistant() {
-  const [mode, setMode] = useState('ttt')   // 'ftf' | 'sts' | 'ttt'
+  const [mode, setMode] = useState('ftf')   // 'ftf' | 'sts' | 'ttt' — avatar-first (research core)
+  const [user] = useState(() => { try { return getUser() } catch { return null } })
   const [messages, setMessages] = useState([
     { role: 'bot', text: "Hi! I'm GBA Assistant — trained on everything about the Global Business AI major. Ask me anything: courses, faculty, application, career outcomes, life in Korea... anything." },
   ])
@@ -574,25 +576,63 @@ export default function Assistant() {
       <PageHero
         eyebrow="AI Assistant"
         title="Talk to our AI"
-        subtitle="Trained on every detail of the program. Choose your preferred mode: avatar, voice, or text."
+        subtitle="Meet the program's AI avatar. Start below and ask anything in English — then tell us about it in a quick survey."
       />
 
       <section className="py-12 bg-[#faf8f3] min-h-[600px]">
         <div className="max-w-5xl mx-auto px-6 lg:px-10">
-          {/* 모드 선택 */}
-          <div className="flex justify-center gap-2 mb-8">
+          {/* How it works — 3 simple steps */}
+          <div className="max-w-2xl mx-auto mb-6 flex items-start justify-center gap-1 sm:gap-3">
             {[
-              { id: 'ftf', icon: Video,         label: 'Avatar Mode' },
-              { id: 'sts', icon: Mic,           label: 'Voice Mode' },
-              { id: 'ttt', icon: MessageSquare, label: 'Text Chat' },
+              { n: '1', t: 'Press Start', s: 'pick Avatar below' },
+              { n: '2', t: 'Ask anything', s: 'talk or type' },
+              { n: '3', t: 'Take the survey', s: '2 minutes' },
+            ].map((st, i) => (
+              <div key={st.n} className="flex items-center gap-1 sm:gap-3">
+                <div className="flex flex-col items-center w-24 sm:w-28">
+                  <div className="w-9 h-9 rounded-full bg-[#0a1e3f] text-white text-base font-bold flex items-center justify-center shadow">
+                    {st.n}
+                  </div>
+                  <div className="mt-1.5 text-[14px] font-bold text-[#0a1e3f] leading-tight">{st.t}</div>
+                  <div className="text-[12px] text-gray-500 leading-tight">{st.s}</div>
+                </div>
+                {i < 2 && <ArrowRight size={18} className="text-[#d4a574] shrink-0 mt-2" />}
+              </div>
+            ))}
+          </div>
+
+          {/* Sign-in tip (optional, only when logged out) */}
+          {!user && (
+            <div className="max-w-xl mx-auto mb-5 flex items-center gap-2 justify-center text-center
+              text-[13px] text-[#0a1e3f] bg-[#fef8ee] border border-[#ecd9a8] rounded-2xl px-4 py-2.5">
+              <LogIn size={16} className="text-[#d4a574] shrink-0" />
+              <span>Tip: <b>Sign in</b> (top-right) first, so the avatar can greet you by name.</span>
+            </div>
+          )}
+
+          {/* Mode picker — Avatar first / recommended */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-2xl mx-auto mb-8">
+            {[
+              { id: 'ftf', icon: Video,         label: 'Avatar', desc: 'See & hear the AI', rec: true },
+              { id: 'sts', icon: Mic,           label: 'Voice',  desc: 'Talk by voice' },
+              { id: 'ttt', icon: MessageSquare, label: 'Text',   desc: 'Type questions' },
             ].map(m => (
               <button key={m.id} onClick={() => { setMode(m.id); recordModeUsed(m.id) }}
-                className={`inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold
-                  transition border ${mode === m.id
+                className={`relative flex flex-col items-center text-center gap-1 px-2 py-3 sm:py-4 rounded-2xl border transition
+                  ${mode === m.id
                     ? 'bg-[#0a1e3f] text-white border-[#0a1e3f] shadow-lg'
                     : 'bg-white text-gray-700 border-gray-200 hover:border-[#d4a574]'}`}>
-                <m.icon size={16} />
-                {m.label}
+                {m.rec && (
+                  <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-bold
+                    uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#d4a574] text-white shadow">
+                    Recommended
+                  </span>
+                )}
+                <m.icon size={24} />
+                <span className="text-[15px] font-bold leading-none mt-0.5">{m.label}</span>
+                <span className={`text-[11px] leading-tight ${mode === m.id ? 'text-white/70' : 'text-gray-500'}`}>
+                  {m.desc}
+                </span>
               </button>
             ))}
           </div>
