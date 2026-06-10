@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Sparkles, Send, User, Bot, Video, Mic, MessageSquare, ArrowRight, LogIn } from 'lucide-react'
+import { Sparkles, Send, User, Bot, Video, Mic, MessageSquare, ArrowRight, LogIn, X } from 'lucide-react'
 import PageHero from '../components/PageHero'
 import AvatarPanel from '../components/AvatarPanel'
 import {
@@ -34,7 +34,8 @@ function recordModeUsed(mode) {
 
 export default function Assistant() {
   const [mode, setMode] = useState('ftf')   // 'ftf' | 'sts' | 'ttt' — avatar-first (research core)
-  const [user] = useState(() => { try { return getUser() } catch { return null } })
+  const [user, setUser] = useState(() => { try { return getUser() } catch { return null } })
+  const [avatarLoginPrompt, setAvatarLoginPrompt] = useState(false)  // sign-in before avatar
   const [messages, setMessages] = useState([
     { role: 'bot', text: "Hi! I'm GBA Assistant — trained on everything about the Global Business AI major. Ask me anything: courses, faculty, application, career outcomes, life in Korea... anything." },
   ])
@@ -564,6 +565,43 @@ export default function Assistant() {
 
   useEffect(() => () => { stopAvatar() }, [stopAvatar])
 
+  // Login-before-avatar: the background-recognition treatment (name, country,
+  // track) is only delivered to signed-in users, so it must happen BEFORE the
+  // avatar conversation — not at survey time. If logged out, prompt sign-in first.
+  const handleStartAvatar = useCallback(() => {
+    let signedIn = false
+    try { signedIn = Boolean(getUser()) } catch { signedIn = false }
+    if (!signedIn) { setAvatarLoginPrompt(true); return }
+    startAvatar()
+  }, [startAvatar])
+
+  const goSignInForAvatar = () => {
+    try { sessionStorage.setItem('gba_pending_avatar', '1') } catch { /* ignore */ }
+    setAvatarLoginPrompt(false)
+    window.dispatchEvent(new Event('gba-open-auth'))
+  }
+
+  // Sync local user; after a sign-in that was triggered to start the avatar,
+  // auto-start it so the student lands straight in the (now personalized) chat.
+  useEffect(() => {
+    const onAuth = () => {
+      let u = null
+      try { u = getUser() } catch { /* ignore */ }
+      setUser(u)
+      if (u) {
+        try {
+          if (sessionStorage.getItem('gba_pending_avatar')) {
+            sessionStorage.removeItem('gba_pending_avatar')
+            setAvatarLoginPrompt(false)
+            startAvatar()
+          }
+        } catch { /* ignore */ }
+      }
+    }
+    window.addEventListener('gba-auth-changed', onAuth)
+    return () => window.removeEventListener('gba-auth-changed', onAuth)
+  }, [startAvatar])
+
   const quickQuestions = [
     'What can I become after graduating?',
     'Tell me about the curriculum',
@@ -666,7 +704,7 @@ export default function Assistant() {
                       userVideoRef={userVideoRef}
                       videoReady={videoReady}
                       cameraActive={Boolean(cameraStream)}
-                      onStart={startAvatar}
+                      onStart={handleStartAvatar}
                       onStop={stopAvatar}
                       onInterrupt={interruptAvatar}
                     />
@@ -949,6 +987,42 @@ export default function Assistant() {
           </div>
         </div>
       </section>
+
+      {/* Sign in before starting the avatar — so background recognition is delivered
+          during the conversation, not just linked at survey time. */}
+      {avatarLoginPrompt && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center overflow-y-auto
+          bg-black/50 backdrop-blur-sm px-4 py-6"
+          onClick={() => setAvatarLoginPrompt(false)}>
+          <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden"
+            onClick={e => e.stopPropagation()}>
+            <div className="relative bg-gradient-to-br from-[#0a1e3f] to-[#1a3567] px-6 py-6 text-center">
+              <button onClick={() => setAvatarLoginPrompt(false)} aria-label="Close"
+                className="absolute top-3.5 right-3.5 text-white/70 hover:text-white transition">
+                <X size={22} />
+              </button>
+              <div className="mx-auto w-12 h-12 rounded-xl bg-[#d4a574] flex items-center justify-center text-white shadow-lg">
+                <Video size={24} />
+              </div>
+              <h3 className="mt-3 text-white text-lg font-bold">Sign in to start the avatar</h3>
+              <p className="mt-1 text-white/75 text-sm leading-relaxed">
+                The avatar greets you by name and tailors answers to you — please sign in first.
+              </p>
+            </div>
+            <div className="px-6 py-5">
+              <button onClick={goSignInForAvatar}
+                className="w-full py-3 rounded-xl bg-[#0a1e3f] text-white text-sm font-semibold
+                  shadow-lg hover:bg-[#16335f] transition">
+                Sign in &amp; start
+              </button>
+              <button onClick={() => { setAvatarLoginPrompt(false); startAvatar() }}
+                className="w-full mt-2 py-2.5 text-sm text-gray-500 hover:text-[#0a1e3f] transition">
+                Start without signing in
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
