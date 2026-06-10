@@ -619,22 +619,22 @@ export default function Assistant() {
 
       <section className="py-12 bg-[#faf8f3] min-h-[600px]">
         <div className="max-w-5xl mx-auto px-6 lg:px-10">
-          {/* How it works — 3 simple steps */}
-          <div className="max-w-2xl mx-auto mb-6 flex items-start justify-center gap-1 sm:gap-3">
+          {/* How it works — 3 simple steps (arrows aligned to the circle centers) */}
+          <div className="max-w-md sm:max-w-2xl mx-auto mb-6 flex items-start justify-center gap-0.5 sm:gap-3">
             {[
-              { n: '1', t: 'Press Start', s: 'pick Avatar below' },
+              { n: '1', t: 'Press Start', s: 'pick Avatar' },
               { n: '2', t: 'Ask anything', s: 'talk or type' },
-              { n: '3', t: 'Take the survey', s: '2 minutes' },
+              { n: '3', t: 'Take survey', s: '2 minutes' },
             ].map((st, i) => (
-              <div key={st.n} className="flex items-center gap-1 sm:gap-3">
-                <div className="flex flex-col items-center w-24 sm:w-28">
+              <div key={st.n} className="flex items-start gap-0.5 sm:gap-3">
+                <div className="flex flex-col items-center w-[92px] sm:w-28">
                   <div className="w-9 h-9 rounded-full bg-[#0a1e3f] text-white text-base font-bold flex items-center justify-center shadow">
                     {st.n}
                   </div>
-                  <div className="mt-1.5 text-[14px] font-bold text-[#0a1e3f] leading-tight">{st.t}</div>
-                  <div className="text-[12px] text-gray-500 leading-tight">{st.s}</div>
+                  <div className="mt-1.5 text-[13px] sm:text-[14px] font-bold text-[#0a1e3f] leading-tight whitespace-nowrap">{st.t}</div>
+                  <div className="text-[11px] sm:text-[12px] text-gray-500 leading-tight whitespace-nowrap">{st.s}</div>
                 </div>
-                {i < 2 && <ArrowRight size={18} className="text-[#d4a574] shrink-0 mt-2" />}
+                {i < 2 && <ArrowRight size={16} className="text-[#d4a574] shrink-0 mt-3" />}
               </div>
             ))}
           </div>
