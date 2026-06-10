@@ -676,7 +676,7 @@ export default function Assistant() {
           </div>
 
           {/* 챗 컨테이너 */}
-          <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col h-[600px]">
+          <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col h-[680px] sm:h-[600px]">
             {/* 헤더 */}
             <div className="px-6 py-4 bg-gradient-to-r from-[#0a1e3f] to-[#1a3567] text-white flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#d4a574] flex items-center justify-center font-bold">

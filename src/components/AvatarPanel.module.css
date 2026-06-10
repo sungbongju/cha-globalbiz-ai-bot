@@ -761,9 +761,9 @@
     /* Mobile: height-capped portrait so the avatar never hogs the section
        (leaves room for the End button, transcript and input). */
     width: auto;
-    height: min(196px, 30vh);
-    max-height: 196px;
-    max-width: 78vw;
+    height: min(168px, 25vh);
+    max-height: 168px;
+    max-width: 72vw;
     aspect-ratio: 3/4;
     border-radius: 18px;
   }
@@ -913,9 +913,9 @@
   }
   .videoWrap {
     width: auto;
-    height: min(176px, 27vh);
-    max-height: 176px;
-    max-width: 72vw;
+    height: min(150px, 23vh);
+    max-height: 150px;
+    max-width: 66vw;
   }
 
   .cameraPreview {
