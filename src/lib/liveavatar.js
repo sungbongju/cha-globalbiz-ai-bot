@@ -1,6 +1,7 @@
 // src/lib/liveavatar.js
 // Minimal LiveAvatar client helpers ported from cha-interview-bot-liveavatar
 // (src/App.jsx). Handles DataChannel commands + session keep-alive/stop.
+import { apiUrl } from './endpoints'
 
 // LiveAvatar DataChannel command — heygen-com/liveavatar-web-sdk spec.
 // Every command requires an event_id (UUID); without it the agent drops it.
@@ -34,7 +35,7 @@ export function sendAvatarCommand(room, eventType, data) {
 export async function stopLiveAvatarSession(sessionId) {
   if (!sessionId) return
   try {
-    await fetch('/api/liveavatar-session', {
+    await fetch(apiUrl('liveavatar-session'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'stop', session_id: sessionId, reason: 'USER_CLOSED' }),
@@ -45,7 +46,7 @@ export async function stopLiveAvatarSession(sessionId) {
 export async function keepAliveLiveAvatar(sessionId) {
   if (!sessionId) return
   try {
-    await fetch('/api/liveavatar-session', {
+    await fetch(apiUrl('liveavatar-session'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'keep-alive', session_id: sessionId }),
@@ -58,7 +59,7 @@ export async function keepAliveLiveAvatar(sessionId) {
 export async function createLiveAvatarSession({ avatarId, interactivityType = 'CONVERSATIONAL' } = {}) {
   const body = { interactivity_type: interactivityType }
   if (avatarId) body.avatar_id = avatarId
-  const sess = await fetch('/api/liveavatar-token', {
+  const sess = await fetch(apiUrl('liveavatar-token'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

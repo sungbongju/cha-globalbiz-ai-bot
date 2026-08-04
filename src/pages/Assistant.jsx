@@ -12,6 +12,7 @@ import { MicRecorder, isMicRecorderSupported } from '../lib/stt'
 import { speak as ttsSpeak, stopSpeaking as ttsStop } from '../lib/tts'
 import { streamChat } from '../lib/chat'
 import { getUser, logVisit } from '../lib/auth'
+import { apiUrl } from '../lib/endpoints'
 
 const FALLBACK_REPLY =
   "Sorry — I couldn't reach the assistant just now. Please try again in a moment."
@@ -211,7 +212,7 @@ export default function Assistant() {
       return
     }
     const rec = new MicRecorder({
-      sttEndpoint: '/api/stt',
+      sttEndpoint: apiUrl('stt'),
       onTranscript: (t) => handleVoiceTranscript(t),
       onError: (err) => console.warn('[voice] MicRecorder error:', err),
       onStateChange: (st) => {
@@ -335,7 +336,7 @@ export default function Assistant() {
       return
     }
     const rec = new MicRecorder({
-      sttEndpoint: '/api/stt',
+      sttEndpoint: apiUrl('stt'),
       onTranscript: (t) => handleAvatarVoiceTranscript(t),
       onError: (err) => console.warn('[avatar-voice] MicRecorder error:', err),
     })
