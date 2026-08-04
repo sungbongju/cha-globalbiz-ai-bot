@@ -10,6 +10,8 @@
 // The returned promise resolves when playback finishes (or rejects on error),
 // so callers can sequence "speaking" -> "listening" state transitions.
 
+import { apiUrl } from './endpoints'
+
 let sharedAudio = null
 
 function getAudioEl() {
@@ -46,7 +48,7 @@ export async function speak(text, opts = {}) {
   const clean = sanitizeForTTS(text)
   if (!clean) return
 
-  const endpoint = opts.endpoint || '/api/tts'
+  const endpoint = opts.endpoint || apiUrl('tts')
   const body = { text: clean }
   if (opts.instruct) body.instruct = opts.instruct
 

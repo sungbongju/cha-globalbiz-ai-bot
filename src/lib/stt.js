@@ -8,8 +8,10 @@
 //  - 우리 whisper(한국어 강제)로 일관된 인식 품질
 //  - race condition 많던 ref 가드 로직 제거, 단일 상태머신
 
+import { apiUrl } from './endpoints'
+
 const DEFAULTS = {
-  sttEndpoint: '/api/stt',
+  sttEndpoint: apiUrl('stt'),
   voiceThreshold: 0.018, // RMS 임계값 — 이 이상이면 "발화 중"
   silenceMs: 1100, // 이만큼 무음 지속되면 발화 종료로 판정
   minSpeechMs: 500, // 이보다 짧은 발화는 노이즈로 무시 (whisper hallucination 방지)

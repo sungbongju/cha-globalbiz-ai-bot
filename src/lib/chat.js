@@ -9,6 +9,7 @@
 // userContext (name + visit count) so the bot can greet them by name and
 // acknowledge returning visitors. No PII beyond what the bot needs is sent.
 import { getUser } from './auth'
+import { apiUrl } from './endpoints'
 
 const TRACK_LABELS = {
   business: 'Business Management',
@@ -42,7 +43,7 @@ function buildUserContext() {
  * @returns {Promise<string>}           The final full reply text.
  */
 export async function streamChat(message, opts = {}) {
-  const endpoint = opts.endpoint || '/api/chat-stream'
+  const endpoint = opts.endpoint || apiUrl('chat-stream')
   const userContext = opts.userContext !== undefined ? opts.userContext : buildUserContext()
   const res = await fetch(endpoint, {
     method: 'POST',

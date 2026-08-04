@@ -1,5 +1,8 @@
 // 학교 서버 PHP API 클라이언트 (cha_interview_db, *_gba 테이블 — interview-bot과 완전 격리)
-const API_BASE = '/api/school-api'
+// 배포 대상마다 백엔드가 다르다. Vercel은 api/school-api.js 서버리스 함수를 쓰고,
+// 학교 서버(aiforalab.com/gba/)는 Apache + globalbiz-api.php 를 쓴다.
+// 학교 서버용 빌드는 `npm run build:gba` (VITE_API_BASE 주입) 로 만든다.
+const API_BASE = import.meta.env.VITE_API_BASE || '/api/school-api'
 
 const TOKEN_KEY = 'gba_token'
 const USER_KEY  = 'gba_user'

@@ -43,7 +43,7 @@ export default async function handler(req, res) {
         input,
         voice: 'alloy', // omnivoice는 voice 무시, instruct로 음색 제어
         response_format: 'wav',
-        language: 'ko',
+        language: 'en', // 영어 강의 전공 사이트 — 한국어 템플릿 잔재였음 (2026-08-03)
         instruct: body.instruct || OMNI_INSTRUCT,
       }),
     })

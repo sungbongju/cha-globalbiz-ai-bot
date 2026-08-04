@@ -9,9 +9,11 @@ import Career from './pages/Career'
 import Admission from './pages/Admission'
 import Assistant from './pages/Assistant'
 
+// 하위 경로 배포(학교 서버 /gba/)와 루트 배포(Vercel)를 한 소스로 지원한다.
+// basename 에는 vite 의 --base 값이 BASE_URL 로 그대로 들어온다.
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/"            element={<Home />} />

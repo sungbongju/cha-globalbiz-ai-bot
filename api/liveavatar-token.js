@@ -57,7 +57,9 @@ export default async function handler(req, res) {
         },
         avatar_persona: {
           context_id: contextId,
-          language: "ko",
+          // 영어 강의 전공 + 유학생 대상 사이트라 'en'. 한국어 프로젝트 템플릿에서
+          // 'ko'가 복붙된 채 남아 있었다(2026-08-03 수정, 서버 PHP 포팅본과 동일).
+          language: "en",
           // 사진(이미지) 기반 아바타는 자체 음성이 없어 voice_id 필수.
           // dkpark = 박교수님 본인 클론 음성(Voice Clone). eleven_flash_v2_5(다국어)라 한/영 모두 발화.
           // ⚠️ API는 voice_id를 avatar_persona 바로 아래에서 읽음 (voice_settings 안이 아님).
