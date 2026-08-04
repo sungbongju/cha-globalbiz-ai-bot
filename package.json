@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "build:gba": "vite build --base=/gba/ --mode gba",
+    "build": "vite build --base=/gba/ --mode gba",
+    "build:vercel": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

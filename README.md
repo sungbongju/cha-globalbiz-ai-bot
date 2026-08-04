@@ -8,15 +8,21 @@ React 19 + Vite + Tailwind. 아바타 상담(LiveAvatar), 음성/텍스트 챗�
 같은 소스를 서로 **다른 백엔드** 위에 올린다. 빌드 명령을 잘못 쓰면 화면은 멀쩡한데
 회원가입·설문·방문로깅·아바타·음성이 전부 404 로 죽는다. 실제로 그런 사고가 있었다.
 
-| | Vercel | 학교 서버 (운영) |
+| | **학교 서버 (운영)** | Vercel (구버전 방치) |
 |---|---|---|
-| 주소 | `cha-globalbiz-ai-bot.vercel.app` | `aiforalab.com/gba/` |
-| 빌드 | `npm run build` | **`npm run build:gba`** |
-| 경로 base | `/` | `/gba/` |
-| 챗·아바타 API | `/api/<name>` (`api/<name>.js` 서버리스) | `/gba/api/<name>.php` |
-| 회원·설문 API | `/api/school-api` (`api/school-api.js`) | `/globalbiz-api/globalbiz-api.php` |
+| 주소 | **`aiforalab.com/gba/`** | `cha-globalbiz-ai-bot.vercel.app` |
+| 빌드 | **`npm run build`** (기본값) | `npm run build:vercel` |
+| 경로 base | `/gba/` | `/` |
+| 챗·아바타 API | `/gba/api/<name>.php` | `/api/<name>` (`api/<name>.js` 서버리스) |
+| 회원·설문 API | `/globalbiz-api/globalbiz-api.php` | `/api/school-api` (`api/school-api.js`) |
 
-`npm run build:gba` 는 `--base=/gba/` 와 `--mode gba` 를 붙여 `.env.gba` 를 읽는다.
+**기본값(`npm run build`)이 운영용이다.** 운영이 학교 서버이므로, 아무 생각 없이 빌드해도
+운영이 깨지지 않는 쪽을 기본으로 둔다. `--base=/gba/` 와 `--mode gba`(→ `.env.gba`)가 붙는다.
+
+Vercel 은 대시보드에서 GitHub 에 연동돼 있어 push 시 자동 재빌드될 수 있다. 기본 빌드가
+운영용으로 바뀌었으므로 `vercel.json` 에 `buildCommand: npm run build:vercel` 을 못박아 두었다.
+이 줄을 지우면 Vercel 배포가 `/gba/` base 로 빌드돼 깨진다.
+
 경로 분기는 하드코딩하지 말고 반드시 아래 두 곳을 거칠 것:
 
 - `src/lib/endpoints.js` — `apiUrl('stt')` → 대상별로 `/api/stt` 또는 `/gba/api/stt.php`
@@ -27,7 +33,7 @@ React 19 + Vite + Tailwind. 아바타 상담(LiveAvatar), 음성/텍스트 챗�
 ## 학교 서버 배포
 
 ```bash
-npm run build:gba
+npm run build
 # dist/ 를 /var/www/html/gba/ 로 복사 (파일 소유자는 sdkpark:sdkpark, 644)
 ```
 
